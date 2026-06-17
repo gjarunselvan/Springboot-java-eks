@@ -1,3 +1,5 @@
 aws ecr describe-repositories \
---repository-names springboot-jenkins-ecr-repo \
---region us-east-2
+--repository-name springboot-jenkins-ecr-repo \
+--region us-east-2 \
+--query 'repositories[0].repositoryUri' \
+--output text
