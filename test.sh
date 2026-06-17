@@ -1,20 +1,16 @@
-# Backup old kubeconfig
-mkdir -p ~/.kube
-cp ~/.kube/config ~/.kube/config.bak 2>/dev/null
+echo "===== AWS CLI ====="
+aws --version
 
-# Remove current kubeconfig
-rm -f ~/.kube/config
-
-# Recreate kubeconfig
-aws eks update-kubeconfig \
-  --region us-east-2 \
-  --name jenkins-cluster
-
-# Verify kubeconfig uses AWS CLI
-grep command ~/.kube/config
-
-# Test authentication
+echo "===== Caller Identity ====="
 aws sts get-caller-identity
 
-# Test cluster access
-kubectl get nodes -o wide
+echo "===== Current Context ====="
+kubectl config current-context
+
+echo "===== Kubeconfig Command ====="
+grep -A5 command ~/.kube/config
+
+echo "===== EKS Token ====="
+aws eks get-token \
+  --region us-east-2 \
+  --cluster-name jenkins-cluster | head
