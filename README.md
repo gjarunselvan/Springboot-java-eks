@@ -1,44 +1,44 @@
-cat > repair.sh <<'EOF'
+cat > jenkins-manual.sh <<'EOF'
 #!/bin/bash
 
 set -e
 
-echo "===== System Info ====="
-cat /etc/os-release
+sudo apt update
 
-echo "===== Java ====="
-java -version || true
+# Java
+sudo apt install -y openjdk-21-jdk wget
 
-echo "===== AWS CLI ====="
-aws --version || true
+# Jenkins WAR
+wget -O jenkins.war https://get.jenkins.io/war-stable/latest/jenkins.war
 
-echo "===== Docker ====="
-docker --version || true
+# Create jenkins user
+sudo useradd -m -s /bin/bash jenkins || true
 
-echo "===== Cleaning Broken Jenkins Config ====="
-sudo rm -f /etc/apt/sources.list.d/jenkins.list
-sudo rm -f /usr/share/keyrings/jenkins-keyring.gpg
-sudo rm -f /etc/apt/keyrings/jenkins.asc
+# Jenkins service
+sudo tee /etc/systemd/system/jenkins.service > /dev/null <<SERVICE
+[Unit]
+Description=Jenkins
+After=network.target
 
-echo "===== Installing Prerequisites ====="
-sudo apt-get update
-sudo apt-get install -y curl wget gnupg ca-certificates software-properties-common
+[Service]
+Type=simple
+User=jenkins
+WorkingDirectory=/home/jenkins
+ExecStart=/usr/bin/java -jar /home/jenkins/jenkins.war --httpPort=8080
+Restart=always
 
-echo "===== Adding Jenkins Repository ====="
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | \
-sudo tee /etc/apt/keyrings/jenkins.asc > /dev/null
+[Install]
+WantedBy=multi-user.target
+SERVICE
 
-echo "deb [signed-by=/etc/apt/keyrings/jenkins.asc] https://pkg.jenkins.io/debian-stable binary/" | \
-sudo tee /etc/apt/sources.list.d/jenkins.list
+sudo mv jenkins.war /home/jenkins/
+sudo chown -R jenkins:jenkins /home/jenkins
 
-echo "===== Repository File ====="
-cat /etc/apt/sources.list.d/jenkins.list
+sudo systemctl daemon-reload
+sudo systemctl enable jenkins
+sudo systemctl restart jenkins
 
-echo "===== Updating ====="
-sudo apt-get update || true
+sleep 20
 
-echo "===== Jenkins Policy ====="
-apt-cache policy jenkins || true
-
-echo "===== Done ====="
+sudo systemctl status jenkins --no-pager
 EOF
