@@ -1,13 +1,18 @@
-./setup.sh 
-Hit:1 http://deb.debian.org/debian trixie InRelease
-Hit:2 http://deb.debian.org/debian trixie-updates InRelease
-Hit:3 http://deb.debian.org/debian-security trixie-security InRelease
-Reading package lists...
-Reading package lists...
-Building dependency tree...
-Reading state information...
-docker.io is already the newest version (26.1.5+dfsg1-9+b13).
-0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
-Docker version 26.1.5+dfsg1, build a72d7cd
-permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.45/containers/json": dial unix /var/run/docker.sock: connect: permission denied
-ubuntu@ip-172-31-39-221:~$ 
+DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+
+echo "Docker Socket GID: $DOCKER_GID"
+
+sudo docker exec -u root jenkins groupadd -g $DOCKER_GID dockerhost 2>/dev/null || true
+
+sudo docker exec -u root jenkins usermod -aG dockerhost jenkins
+
+sudo docker restart jenkins
+
+echo "Waiting for Jenkins..."
+sleep 20
+
+echo "Jenkins User:"
+sudo docker exec jenkins id
+
+echo "Testing Docker Access:"
+sudo docker exec jenkins docker ps
