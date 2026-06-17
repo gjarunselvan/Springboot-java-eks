@@ -1,18 +1,13 @@
-# Get Docker group ID from host
-DOCKER_GID=$(getent group docker | cut -d: -f3)
-
-echo "Docker GID: $DOCKER_GID"
-
-# Add Jenkins user inside container to host Docker group
-sudo docker exec -u root jenkins groupadd -g $DOCKER_GID docker-host 2>/dev/null || true
-
-sudo docker exec -u root jenkins usermod -aG $DOCKER_GID jenkins
-
-# Restart container
-sudo docker restart jenkins
-
-# Wait a few seconds
-sleep 15
-
-# Test Docker access
-sudo docker exec jenkins docker ps
+./setup.sh 
+Hit:1 http://deb.debian.org/debian trixie InRelease
+Hit:2 http://deb.debian.org/debian trixie-updates InRelease
+Hit:3 http://deb.debian.org/debian-security trixie-security InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+docker.io is already the newest version (26.1.5+dfsg1-9+b13).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+Docker version 26.1.5+dfsg1, build a72d7cd
+permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.45/containers/json": dial unix /var/run/docker.sock: connect: permission denied
+ubuntu@ip-172-31-39-221:~$ 
