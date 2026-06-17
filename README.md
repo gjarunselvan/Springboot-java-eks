@@ -1,43 +1,44 @@
-cat > fix-jenkins.sh <<'EOF'
+cat > repair.sh <<'EOF'
 #!/bin/bash
 
 set -e
 
-echo "===== Installing prerequisites ====="
-sudo apt-get update -y
-sudo apt-get install -y curl gnupg ca-certificates
+echo "===== System Info ====="
+cat /etc/os-release
 
-echo "===== Removing old Jenkins repo ====="
+echo "===== Java ====="
+java -version || true
+
+echo "===== AWS CLI ====="
+aws --version || true
+
+echo "===== Docker ====="
+docker --version || true
+
+echo "===== Cleaning Broken Jenkins Config ====="
 sudo rm -f /etc/apt/sources.list.d/jenkins.list
 sudo rm -f /usr/share/keyrings/jenkins-keyring.gpg
+sudo rm -f /etc/apt/keyrings/jenkins.asc
 
-echo "===== Adding Jenkins key ====="
+echo "===== Installing Prerequisites ====="
+sudo apt-get update
+sudo apt-get install -y curl wget gnupg ca-certificates software-properties-common
+
+echo "===== Adding Jenkins Repository ====="
 curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | \
-gpg --dearmor | \
-sudo tee /usr/share/keyrings/jenkins-keyring.gpg >/dev/null
+sudo tee /etc/apt/keyrings/jenkins.asc > /dev/null
 
-echo "===== Adding Jenkins repository ====="
-echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/" | \
+echo "deb [signed-by=/etc/apt/keyrings/jenkins.asc] https://pkg.jenkins.io/debian-stable binary/" | \
 sudo tee /etc/apt/sources.list.d/jenkins.list
 
-echo "===== Updating repositories ====="
-sudo apt-get update -y
+echo "===== Repository File ====="
+cat /etc/apt/sources.list.d/jenkins.list
 
-echo "===== Installing Jenkins ====="
-sudo apt-get install -y jenkins
+echo "===== Updating ====="
+sudo apt-get update || true
 
-echo "===== Starting Jenkins ====="
-sudo systemctl enable jenkins
-sudo systemctl restart jenkins
+echo "===== Jenkins Policy ====="
+apt-cache policy jenkins || true
 
-echo "===== Jenkins Status ====="
-sudo systemctl status jenkins --no-pager
-
-echo "===== Jenkins Password ====="
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-
-echo "===== Public IP ====="
-curl -s ifconfig.me
-echo
-echo "Open: http://$(curl -s ifconfig.me):8080"
+echo "===== Done ====="
 EOF
