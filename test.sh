@@ -1,7 +1,24 @@
-sudo docker volume ls
-DRIVER    VOLUME NAME
-local     17ab0b3182e2c6111feeb1b82f80d89cc7812802825dfe7f1bb2862a4d2aeaa0
-local     jenkins_data
-local     jenkins_home
-local     jenkins_network
-ubuntu@ip-172-31-39-221:~$ 
+# Stop current Jenkins
+sudo docker stop jenkins
+sudo docker rm jenkins
+
+# Start Jenkins using the original volume
+sudo docker run -d \
+--name jenkins \
+--restart unless-stopped \
+-p 8080:8080 \
+-p 50000:50000 \
+-v jenkins_data:/var/jenkins_home \
+-v /var/run/docker.sock:/var/run/docker.sock \
+--network jenkins_network \
+jenkins/jenkins:lts
+
+# Wait for startup
+echo "Waiting 30 seconds for Jenkins..."
+sleep 30
+
+# Verify container
+sudo docker ps
+
+# Verify mounted volume
+sudo docker inspect jenkins | grep -A3 -B3 jenkins_data
