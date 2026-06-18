@@ -1,32 +1,34 @@
-version: '3.8'
+pipeline {
+    agent any
 
-services:
-  mysql-db:
-    image: mysql:8.0
-    container_name: mysql-db
-    environment:
-      MYSQL_ROOT_PASSWORD: Root@123
-      MYSQL_DATABASE: tododb
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - todo-network
+    environment {
+        DOCKER_IMAGE = "gjarunselvan/todo-application:latest"
+    }
 
-  todo-application:
-    image: todo-application-image:latest
-    container_name: todo-application
-    depends_on:
-      - mysql-db
-    ports:
-      - "8082:8081"
-    networks:
-      - todo-network
+    stages {
 
-networks:
-  todo-network:
-    driver: bridge
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/gjarunselvan/todo-application.git'
+            }
+        }
 
-volumes:
-  mysql-data:
+        stage('Build') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE .'
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                sh 'docker push $DOCKER_IMAGE'
+            }
+        }
+    }
+}
