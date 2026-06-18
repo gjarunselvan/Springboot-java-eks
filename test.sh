@@ -1,27 +1,35 @@
-labuser@ip-172-31-2-198:~/Desktop/todo-application$ minikube status
-🤷  Profile "minikube" not found. Run "minikube profile list" to view all profiles.
-👉  To start a cluster, run: "minikube start"
-labuser@ip-172-31-2-198:~/Desktop/todo-application$ minikube start
-😄  minikube v1.35.0 on Ubuntu 22.04
-✨  Automatically selected the docker driver. Other choices: ssh, none
-📌  Using Docker driver with root privileges
-👍  Starting "minikube" primary control-plane node in "minikube" cluster
-🚜  Pulling base image v0.0.46 ...
-🎉  minikube 1.38.1 is available! Download it: https://github.com/kubernetes/minikube/releases/tag/v1.38.1
-💡  To disable this notice, run: 'minikube config set WantUpdateNotification false'
+Run these commands now
+1. Verify cluster
+kubectl get nodes
 
-💾  Downloading Kubernetes v1.32.0 preload ...
-    > preloaded-images-k8s-v18-v1...:  333.57 MiB / 333.57 MiB  100.00% 15.17 M
-🔥  Creating docker container (CPUs=2, Memory=3900MB) ...
-❗  Failing to connect to https://registry.k8s.io/ from both inside the minikube container and host machine
-💡  To pull new external images, you may need to configure a proxy: https://minikube.sigs.k8s.io/docs/reference/networking/proxy/
-🐳  Preparing Kubernetes v1.32.0 on Docker 27.4.1 ...
-    ▪ Generating certificates and keys ...
-    ▪ Booting up control plane ...
-    ▪ Configuring RBAC rules ...
-🔗  Configuring bridge CNI (Container Networking Interface) ...
-🔎  Verifying Kubernetes components...
-    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
-🌟  Enabled addons: storage-provisioner, default-storageclass
-🏄  Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
-labuser@ip-172-31-2-198:~/Desktop/todo-application$ 
+Expected:
+
+NAME       STATUS   ROLES           AGE   VERSION
+minikube   Ready    control-plane   ...
+2. Create Docker registry secret
+kubectl create secret docker-registry my-registry-secret \
+--docker-username=gjarunselvan \
+--docker-password='YOUR_DOCKER_PASSWORD'
+3. Verify secret
+kubectl get secret
+
+You must see:
+
+my-registry-secret
+4. Deploy
+
+From project folder:
+
+kubectl apply -f mysql-deployment.yaml
+kubectl apply -f todo-application-deployment.yaml
+5. Check pods
+kubectl get pods
+6. Check services
+kubectl get svc
+Send me ONLY these outputs
+kubectl get nodes
+kubectl get secret
+kubectl get pods
+kubectl get svc
+
+Once I see those 4 outputs, I'll tell you exactly what remains for the grader. You're very close to the finish line now. 🚀
