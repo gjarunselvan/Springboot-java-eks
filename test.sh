@@ -1,19 +1,32 @@
-# Build Stage
-FROM maven:3.9.9-eclipse-temurin-17 AS builder
+version: '3.8'
 
-WORKDIR /app
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: Root@123
+      MYSQL_DATABASE: tododb
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - todo-network
 
-COPY . .
+  todo-application:
+    image: todo-application-image:latest
+    container_name: todo-application
+    depends_on:
+      - mysql-db
+    ports:
+      - "8082:8081"
+    networks:
+      - todo-network
 
-RUN mvn clean package -DskipTests
+networks:
+  todo-network:
+    driver: bridge
 
-# Runtime Stage
-FROM eclipse-temurin:17-jdk-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app/target/*.jar app.jar
-
-EXPOSE 8081
-
-ENTRYPOINT ["java","-jar","app.jar"]
+volumes:
+  mysql-data:
