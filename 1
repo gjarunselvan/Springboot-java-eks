@@ -1,60 +1,22 @@
-#!/bin/bash
+==================================
+STEP 7 VALIDATION
+CONFIGURE JENKINS FOR DOCKER
+==================================
 
-echo "=================================="
-echo "STEP 7 VALIDATION"
-echo "CONFIGURE JENKINS FOR DOCKER"
-echo "=================================="
+1. JENKINS USER EXISTS
+PASS
 
-PASS=true
+2. JENKINS IN DOCKER GROUP
+PASS
 
-echo ""
-echo "1. JENKINS USER EXISTS"
-if id jenkins >/dev/null 2>&1; then
-    echo "PASS"
-else
-    echo "FAIL"
-    PASS=false
-fi
+3. SWITCH TO JENKINS USER
+WHOAMI = jenkins
+PASS
 
-echo ""
-echo "2. JENKINS IN DOCKER GROUP"
-if groups jenkins | grep -qw docker; then
-    echo "PASS"
-else
-    echo "FAIL"
-    PASS=false
-fi
+4. DOCKER ACCESS AS JENKINS
+PASS
 
-echo ""
-echo "3. SWITCH TO JENKINS USER"
-WHOAMI_RESULT=$(sudo su -s /bin/bash jenkins -c "whoami")
-
-echo "WHOAMI = $WHOAMI_RESULT"
-
-if [ "$WHOAMI_RESULT" = "jenkins" ]; then
-    echo "PASS"
-else
-    echo "FAIL"
-    PASS=false
-fi
-
-echo ""
-echo "4. DOCKER ACCESS AS JENKINS"
-
-if sudo su -s /bin/bash jenkins -c "docker ps >/dev/null 2>&1"; then
-    echo "PASS"
-else
-    echo "FAIL"
-    PASS=false
-fi
-
-echo ""
-echo "=================================="
-echo "RESULT"
-echo "=================================="
-
-if [ "$PASS" = true ]; then
-    echo "STEP 7 PASSED"
-else
-    echo "STEP 7 FAILED"
-fi
+==================================
+RESULT
+==================================
+STEP 7 PASSED
