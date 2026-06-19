@@ -1,75 +1,120 @@
-Verify:
+#!/bin/bash
 
-java -version
-3.3 Install AWS CLI
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+echo "=============================="
+echo "STEP 3.4 - AWS IAM AUTHENTICATOR"
+echo "=============================="
 
-sudo apt install unzip -y
-
-unzip awscliv2.zip
-
-sudo ./aws/install
-
-Verify:
-
-aws --version
-3.4 Install AWS IAM Authenticator
-curl -Lo aws-iam-authenticator https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/latest/download/aws-iam-authenticator_linux_amd64
+curl -L -o aws-iam-authenticator \
+https://amazon-eks.s3.us-west-2.amazonaws.com/1.32.0/2024-12-20/bin/linux/amd64/aws-iam-authenticator
 
 chmod +x aws-iam-authenticator
 
-sudo mv aws-iam-authenticator /usr/local/bin/
+sudo mv aws-iam-authenticator /usr/local/bin/ 2>/dev/null
 
-Verify:
+echo ""
+echo "AWS IAM Authenticator:"
+aws-iam-authenticator version || echo "Authenticator installation skipped"
 
-aws-iam-authenticator version
-3.5 Install Docker
+echo ""
+echo "=============================="
+echo "STEP 3.5 - DOCKER"
+echo "=============================="
+
+sudo apt update
+
 sudo apt install docker.io -y
 
-Start Docker:
-
 sudo systemctl enable docker
+
 sudo systemctl start docker
 
-Verify:
-
+echo ""
+echo "Docker Version:"
 docker --version
-sudo systemctl status docker
-3.6 Install Jenkins
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
-/usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+echo ""
+echo "Docker Status:"
+sudo systemctl is-active docker
+
+echo ""
+echo "=============================="
+echo "STEP 3.6 - JENKINS"
+echo "=============================="
+
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | \
+sudo tee /usr/share/keyrings/jenkins-keyring.asc >/dev/null
 
 echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
-https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
-/etc/apt/sources.list.d/jenkins.list > /dev/null
+https://pkg.jenkins.io/debian-stable binary/ | \
+sudo tee /etc/apt/sources.list.d/jenkins.list >/dev/null
 
 sudo apt update
 
 sudo apt install jenkins -y
 
-Start Jenkins:
-
 sudo systemctl enable jenkins
+
 sudo systemctl start jenkins
 
-Verify:
+echo ""
+echo "Jenkins Status:"
+sudo systemctl is-active jenkins
 
-sudo systemctl status jenkins
-Get Jenkins Password
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-Access Jenkins
+echo ""
+echo "=============================="
+echo "STEP 4 - DOCKER VOLUME"
+echo "=============================="
 
-Open:
+docker volume create jenkins_data
 
-http://<EC2-PUBLIC-IP>:8080
+echo ""
+echo "Docker Volumes:"
+docker volume ls
 
-Paste the password and complete the initial setup.
+echo ""
+echo "=============================="
+echo "STEP 5 - DOCKER NETWORK"
+echo "=============================="
 
-Before moving to Step 4, verify:
+docker network create jenkins_network
+
+echo ""
+echo "Docker Networks:"
+docker network ls | grep jenkins
+
+echo ""
+echo "=============================="
+echo "VERIFICATION"
+echo "=============================="
+
+echo ""
+echo "Java:"
 java -version
-aws --version
-docker --version
-sudo systemctl status docker
-sudo systemctl status jenkins
 
-Send me the outputs (or screenshots), and I'll give you Step 4: Docker Volume + Docker Network + Run Jenkins Container, which is worth 20 marks in your evaluation.
+echo ""
+echo "AWS:"
+aws --version
+
+echo ""
+echo "Docker:"
+docker --version
+
+echo ""
+echo "Docker Service:"
+sudo systemctl is-active docker
+
+echo ""
+echo "Jenkins Service:"
+sudo systemctl is-active jenkins
+
+echo ""
+echo "Jenkins Initial Password:"
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+echo ""
+echo "Public IP:"
+curl -s ifconfig.me
+
+echo ""
+echo "Open Jenkins:"
+echo "http://<PUBLIC-IP>:8080"
