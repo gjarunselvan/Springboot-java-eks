@@ -1,50 +1,26 @@
-#!/bin/bash
+==================================
+DISABLE JENKINS SECURITY
+==================================
 
-echo "=================================="
-echo "DISABLE JENKINS SECURITY"
-echo "=================================="
+VERIFY
+  <useSecurity>false</useSecurity>
 
-cp /home/ubuntu/.jenkins/config.xml \
-/home/ubuntu/.jenkins/config.xml.bak
+RESTART JENKINS
+Killed                     sudo pkill -9 -f jenkins.war
 
-sed -i 's/<useSecurity>true<\/useSecurity>/<useSecurity>false<\/useSecurity>/g' \
-/home/ubuntu/.jenkins/config.xml
+WAIT 45 SECONDS...
 
-echo ""
-echo "VERIFY"
-grep useSecurity /home/ubuntu/.jenkins/config.xml
+PROCESS
 
-echo ""
-echo "RESTART JENKINS"
+WEB
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0
+curl: (7) Failed to connect to localhost port 8080 after 1 ms: Could not connect to server
 
-sudo pkill -9 -f jenkins.war || true
-
-sleep 5
-
-sudo su - jenkins -c "
-JENKINS_HOME=/home/ubuntu/.jenkins \
-nohup java \
--DJENKINS_HOME=/home/ubuntu/.jenkins \
--jar /home/jenkins/jenkins/jenkins.war \
---httpPort=8080 \
->/tmp/jenkins.log 2>&1 &
-"
-
-echo ""
-echo "WAIT 45 SECONDS..."
-sleep 45
-
-echo ""
-echo "PROCESS"
-ps -ef | grep jenkins.war | grep -v grep
-
-echo ""
-echo "WEB"
-curl -I http://localhost:8080 | head -5
-
-echo ""
-echo "=================================="
-echo "DONE"
-echo "=================================="
-echo "Open Jenkins now."
-echo "It should not ask for login."
+==================================
+DONE
+==================================
+Open Jenkins now.
+It should not ask for login.
+ubuntu@ip-172-31-47-234:~$ 
