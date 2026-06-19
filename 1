@@ -1,40 +1,66 @@
-#!/bin/bash
+==================================
+FIX JENKINS HOME PERMISSIONS
+==================================
 
-echo "=================================="
-echo "FIX JENKINS HOME PERMISSIONS"
-echo "=================================="
+START JENKINS
 
-sudo chown -R jenkins:jenkins /home/ubuntu/.jenkins
+WAIT 30 SECONDS
 
-sudo chmod -R u+rwX /home/ubuntu/.jenkins
+PROCESS
 
-echo ""
-echo "START JENKINS"
+PORT
 
-sudo su - jenkins -c "
-export JENKINS_HOME=/home/ubuntu/.jenkins
-nohup java \
--DJENKINS_HOME=/home/ubuntu/.jenkins \
--jar /home/jenkins/jenkins/jenkins.war \
---httpPort=8080 \
->/tmp/jenkins.log 2>&1 &
-"
+LOG
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at executable.Main.main(Main.java:332)
+2026-06-19 14:47:12.583+0000 [id=1]	WARNING	winstone.Logger#logInternal: Failed to recreate dirs /home/ubuntu/.jenkins/war
+java.nio.file.AccessDeniedException: /home/ubuntu/.jenkins
+	at java.base/sun.nio.fs.UnixException.translateToIOException(UnixException.java:90)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:106)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
+	at java.base/sun.nio.fs.UnixFileSystemProvider.checkAccess(UnixFileSystemProvider.java:354)
+	at java.base/java.nio.file.Files.createDirectories(Files.java:773)
+	at Jenkins Main ClassLoader//winstone.HostConfiguration.getWebRoot(HostConfiguration.java:284)
+	at Jenkins Main ClassLoader//winstone.HostConfiguration.<init>(HostConfiguration.java:84)
+	at Jenkins Main ClassLoader//winstone.HostGroup.initHost(HostGroup.java:59)
+	at Jenkins Main ClassLoader//winstone.HostGroup.<init>(HostGroup.java:37)
+	at Jenkins Main ClassLoader//winstone.Launcher.<init>(Launcher.java:171)
+	at Jenkins Main ClassLoader//winstone.Launcher.main(Launcher.java:493)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at executable.Main.main(Main.java:332)
+2026-06-19 14:47:12.585+0000 [id=1]	WARNING	winstone.Logger#logInternal: Failed to create dirs /home/ubuntu/.jenkins/war/META-INF
+2026-06-19 14:47:12.586+0000 [id=1]	INFO	winstone.Logger#logInternal: Jetty shutdown successfully
+java.io.FileNotFoundException: /home/ubuntu/.jenkins/war/META-INF/MANIFEST.MF (Permission denied)
+	at java.base/java.io.FileOutputStream.open0(Native Method)
+	at java.base/java.io.FileOutputStream.open(FileOutputStream.java:289)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:230)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:179)
+	at Jenkins Main ClassLoader//winstone.HostConfiguration.getWebRoot(HostConfiguration.java:334)
+	at Jenkins Main ClassLoader//winstone.HostConfiguration.<init>(HostConfiguration.java:84)
+	at Jenkins Main ClassLoader//winstone.HostGroup.initHost(HostGroup.java:59)
+	at Jenkins Main ClassLoader//winstone.HostGroup.<init>(HostGroup.java:37)
+	at Jenkins Main ClassLoader//winstone.Launcher.<init>(Launcher.java:171)
+	at Jenkins Main ClassLoader//winstone.Launcher.main(Launcher.java:493)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at executable.Main.main(Main.java:332)
+2026-06-19 14:47:12.588+0000 [id=1]	SEVERE	winstone.Logger#logInternal: Container startup failed
+java.io.FileNotFoundException: /home/ubuntu/.jenkins/war/META-INF/MANIFEST.MF (Permission denied)
+	at java.base/java.io.FileOutputStream.open0(Native Method)
+	at java.base/java.io.FileOutputStream.open(FileOutputStream.java:289)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:230)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:179)
+	at Jenkins Main ClassLoader//winstone.HostConfiguration.getWebRoot(HostConfiguration.java:334)
+	at Jenkins Main ClassLoader//winstone.HostConfiguration.<init>(HostConfiguration.java:84)
+	at Jenkins Main ClassLoader//winstone.HostGroup.initHost(HostGroup.java:59)
+	at Jenkins Main ClassLoader//winstone.HostGroup.<init>(HostGroup.java:37)
+	at Jenkins Main ClassLoader//winstone.Launcher.<init>(Launcher.java:171)
+	at Jenkins Main ClassLoader//winstone.Launcher.main(Launcher.java:493)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at executable.Main.main(Main.java:332)
 
-echo ""
-echo "WAIT 30 SECONDS"
-sleep 30
-
-echo ""
-echo "PROCESS"
-ps -ef | grep jenkins.war | grep -v grep
-
-echo ""
-echo "PORT"
-ss -tulpn | grep 8080
-
-echo ""
-echo "LOG"
-tail -50 /tmp/jenkins.log
-
-echo ""
-echo "DONE"
+DONE
+ubuntu@ip-172-31-47-234:~$ 
