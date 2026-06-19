@@ -1,25 +1,9 @@
-#!/bin/bash
-
-echo "Stopping Jenkins..."
-sudo systemctl stop jenkins
-
-echo "Backing up old Jenkins data..."
-sudo mv /var/lib/jenkins /var/lib/jenkins_backup_$(date +%s)
-
-echo "Creating fresh Jenkins home..."
-sudo mkdir -p /var/lib/jenkins
-
-sudo chown -R jenkins:jenkins /var/lib/jenkins
-
-echo "Starting Jenkins..."
-sudo systemctl start jenkins
-
-sleep 20
-
-echo ""
-echo "New Jenkins Password:"
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-
-echo ""
-echo "Jenkins URL:"
-echo "http://$(curl -s ifconfig.me):8080"
+Built-In Node
+Bring this node back online
+Update offline reason
+This is the Jenkins controller's built-in node. Builds running on this node will execute on the same system and as the same user as the Jenkins controller. This is appropriate e.g. for special jobs performing backups, but in general you should run builds on agents. Learn more about distributed builds.
+Jun 19, 2026, 10:30:59 AM
+Disconnected by jenkins-admin-user : Disk space is below threshold of 1.00 GiB. Only 948.11 MiB out of 952.61 MiB left on /tmp.
+Monitoring Data
+Projects tied to Built-In Node
+None
