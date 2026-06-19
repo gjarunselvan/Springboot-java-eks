@@ -11,39 +11,12 @@ Fetching upstream changes from https://github.com/gjarunselvan/springboot-jenkin
 using GIT_ASKPASS to set credentials git
  > git fetch --tags --force --progress -- https://github.com/gjarunselvan/springboot-jenkins-eks.git +refs/heads/*:refs/remotes/origin/* # timeout=10
  > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
-Checking out Revision 536bbae60cc6c673018e9533730ef9b5743ea481 (refs/remotes/origin/main)
+Checking out Revision ad48bb58cec9e37b8272a91feffc368f9a359f4b (refs/remotes/origin/main)
  > git config core.sparsecheckout # timeout=10
- > git checkout -f 536bbae60cc6c673018e9533730ef9b5743ea481 # timeout=10
+ > git checkout -f ad48bb58cec9e37b8272a91feffc368f9a359f4b # timeout=10
 Commit message: "Update Jenkinsfile"
-First time build. Skipping changelog.
-org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:
-WorkflowScript: 4: unexpected char: '`' @ line 4, column 1.
-   ```
-   ^
-
-1 error
-
-	at org.codehaus.groovy.control.ErrorCollector.failIfErrors(ErrorCollector.java:309)
-	at org.codehaus.groovy.control.ErrorCollector.addFatalError(ErrorCollector.java:149)
-	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:119)
-	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:131)
-	at org.codehaus.groovy.control.SourceUnit.addError(SourceUnit.java:349)
-	at org.codehaus.groovy.antlr.AntlrParserPlugin.transformCSTIntoAST(AntlrParserPlugin.java:220)
-	at org.codehaus.groovy.antlr.AntlrParserPlugin.parseCST(AntlrParserPlugin.java:191)
-	at org.codehaus.groovy.control.SourceUnit.parse(SourceUnit.java:233)
-	at org.codehaus.groovy.control.CompilationUnit$1.call(CompilationUnit.java:189)
-	at org.codehaus.groovy.control.CompilationUnit.applyToSourceUnits(CompilationUnit.java:966)
-	at org.codehaus.groovy.control.CompilationUnit.doPhaseOperation(CompilationUnit.java:626)
-	at org.codehaus.groovy.control.CompilationUnit.processPhaseOperations(CompilationUnit.java:602)
-	at org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:579)
-	at groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:323)
-	at groovy.lang.GroovyClassLoader.parseClass(GroovyClassLoader.java:293)
-	at PluginClassLoader for script-security//org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.GroovySandbox$Scope.parse(GroovySandbox.java:162)
-	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsGroovyShell.doParse(CpsGroovyShell.java:202)
-	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsGroovyShell.reparse(CpsGroovyShell.java:186)
-	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsFlowExecution.parseScript(CpsFlowExecution.java:670)
-	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsFlowExecution.start(CpsFlowExecution.java:616)
-	at PluginClassLoader for workflow-job//org.jenkinsci.plugins.workflow.job.WorkflowRun.run(WorkflowRun.java:341)
-	at hudson.model.ResourceController.execute(ResourceController.java:101)
-	at hudson.model.Executor.run(Executor.java:454)
-Finished: FAILURE
+ > git rev-list --no-walk 536bbae60cc6c673018e9533730ef9b5743ea481 # timeout=10
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Still waiting to schedule task
+Waiting for next available executor
