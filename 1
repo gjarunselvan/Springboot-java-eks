@@ -1,82 +1,48 @@
-======================================
- NUVEPRO FINAL LAB VALIDATION
-======================================
+#!/bin/bash
 
-1. EC2 INSTANCE TYPE
-INSTANCE TYPE = 
-FAIL
+echo "=================================="
+echo "FIX DOCKER ACCESS"
+echo "=================================="
 
-2. IAM ROLE
-FAIL
+echo ""
+echo "1. ADD UBUNTU TO DOCKER GROUP"
+sudo usermod -aG docker ubuntu
 
-3. JAVA
-PASS
+echo ""
+echo "2. VERIFY GROUP MEMBERSHIP"
+groups ubuntu
 
-4. AWS CLI
-PASS
+echo ""
+echo "3. FIX DOCKER SOCKET"
+sudo chown root:docker /var/run/docker.sock
+sudo chmod 660 /var/run/docker.sock
 
-5. DOCKER
-PASS
+echo ""
+echo "4. RESTART DOCKER"
+sudo systemctl restart docker
 
-6. KUBECTL
-PASS
+echo ""
+echo "5. RESTART JENKINS"
+pkill -f jenkins.war || true
 
-7. EKSCTL
-PASS
+nohup java -jar ~/jenkins/jenkins.war \
+--httpPort=8080 \
+> ~/jenkins/jenkins.log 2>&1 &
 
-8. JENKINS
-PASS
+echo ""
+echo "WAITING 30 SECONDS..."
+sleep 30
 
-9. ECR REPOSITORY
-PASS
+echo ""
+echo "6. VERIFY DOCKER"
+docker ps
 
-10. EKS CLUSTER
-STATUS = ACTIVE
-PASS
+echo ""
+echo "7. VERIFY JENKINS"
+curl -I http://localhost:8080 | head -5
 
-11. NODEGROUP
-PASS
-
-12. K8S NODES
-PASS
-
-13. ECR IMAGE
-IMAGE COUNT = 0
-FAIL
-
-14. SPRINGBOOT DEPLOYMENT
-FAIL
-
-15. LOAD BALANCER SERVICE
-FAIL
-
-======================================
-FINAL SCORE : 10 / 15
-======================================
-
-===== DEPLOYMENTS =====
-
-===== PODS =====
-NAMESPACE     NAME                             READY   STATUS    RESTARTS   AGE
-kube-system   aws-node-2jz89                   2/2     Running   0          35m
-kube-system   aws-node-sjsgc                   2/2     Running   0          35m
-kube-system   coredns-6d6c454fdb-fsdz7         1/1     Running   0          38m
-kube-system   coredns-6d6c454fdb-q9l44         1/1     Running   0          38m
-kube-system   kube-proxy-rwbvl                 1/1     Running   0          35m
-kube-system   kube-proxy-vqlzz                 1/1     Running   0          35m
-kube-system   metrics-server-7c4574785-qxwj4   1/1     Running   0          34m
-kube-system   metrics-server-7c4574785-wg562   1/1     Running   0          34m
-
-===== SERVICES =====
-NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
-kubernetes   ClusterIP   10.100.0.1   <none>        443/TCP   41m
-
-===== ECR IMAGES =====
-{
-    "imageIds": []
-}
-
-======================================
-DONE
-======================================
-ubuntu@ip-172-31-47-234:~$ 
+echo ""
+echo "=================================="
+echo "DONE"
+echo "=================================="
+echo "Now go to Jenkins -> Build Now"
