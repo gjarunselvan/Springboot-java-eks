@@ -1,58 +1,87 @@
-======================================
- FINAL LAB VALIDATION
-======================================
+#!/bin/bash
 
-1. EC2
-PASS
+echo "=================================="
+echo "DISK BEFORE"
+echo "=================================="
+df -h
 
-2. IAM ROLE
-PASS
+echo ""
+echo "=================================="
+echo "CLEAN APT CACHE"
+echo "=================================="
+sudo apt clean
 
-3. SECURITY GROUP
-PASS
+echo ""
+echo "=================================="
+echo "CLEAN TMP"
+echo "=================================="
+sudo rm -rf /tmp/*
+sudo rm -rf /var/tmp/*
 
-4. JENKINS
-PASS
+echo ""
+echo "=================================="
+echo "CLEAN DOCKER"
+echo "=================================="
+sudo docker system prune -af
+sudo docker volume prune -f
 
-5. GITHUB REPO
-Username for 'https://github.com': gjarunselvan
-Password for 'https://gjarunselvan@github.com': 
-PASS
+echo ""
+echo "=================================="
+echo "CHECK JENKINS DIRECTORY"
+echo "=================================="
+mkdir -p $HOME/jenkins
 
-6. ECR
-PASS
+if [ ! -f $HOME/jenkins/jenkins.war ]; then
+    echo "Downloading Jenkins..."
+    cd $HOME/jenkins
+    curl -L -o jenkins.war https://get.jenkins.io/war-stable/latest/jenkins.war
+fi
 
-7. EKS
-STATUS=ACTIVE
-PASS
+echo ""
+echo "=================================="
+echo "START JENKINS"
+echo "=================================="
+pkill -f jenkins.war || true
 
-8. NODEGROUP
-PASS
+nohup java -jar $HOME/jenkins/jenkins.war \
+--httpPort=8080 \
+> $HOME/jenkins/jenkins.log 2>&1 &
 
-9. K8S NODES
-PASS
+echo ""
+echo "WAIT 60 SECONDS..."
+sleep 60
 
-10. SPRINGBOOT DEPLOYMENT
-FAIL
+echo ""
+echo "=================================="
+echo "JENKINS CHECK"
+echo "=================================="
+ps -ef | grep jenkins.war
 
-======================================
-FINAL SCORE : 9 / 10
-======================================
+echo ""
+ss -tulpn | grep 8080
 
-===== DEPLOYMENTS =====
+echo ""
+curl -I http://localhost:8080 | head -5
 
-===== PODS =====
+echo ""
+echo "=================================="
+echo "TOOLS CHECK"
+echo "=================================="
+which docker
+which aws
+which kubectl
 
-===== SERVICES =====
-NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
-kubernetes   ClusterIP   10.100.0.1   <none>        443/TCP   13m
+docker --version
+aws --version
+kubectl version --client
 
-===== ECR IMAGES =====
-{
-    "imageIds": []
-}
+echo ""
+echo "=================================="
+echo "DISK AFTER"
+echo "=================================="
+df -h
 
-======================================
-DONE
-======================================
-ubuntu@ip-172-31-47-234:~$ 
+echo ""
+echo "=================================="
+echo "DONE"
+echo "=================================="
