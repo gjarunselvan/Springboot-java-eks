@@ -1,29 +1,52 @@
-ubuntu@ip-172-31-39-80:~$ docker build -t springboot-app .
+Started by user Jenkins Admin
+Checking out git https://github.com/gjarunselvan/springboot-jenkins-eks.git into /var/lib/jenkins/workspace/springboot-jenkins-eks-pipeline@script/b1cd767f4a1eea3cad7694f80308b48592ea69a417e646264771f36102acbec5 to read Jenkinsfile
+The recommended git tool is: NONE
+using credential git
+Cloning the remote Git repository
+Cloning repository https://github.com/gjarunselvan/springboot-jenkins-eks.git
+ > git init /var/lib/jenkins/workspace/springboot-jenkins-eks-pipeline@script/b1cd767f4a1eea3cad7694f80308b48592ea69a417e646264771f36102acbec5 # timeout=10
+Fetching upstream changes from https://github.com/gjarunselvan/springboot-jenkins-eks.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.53.0'
+using GIT_ASKPASS to set credentials git
+ > git fetch --tags --force --progress -- https://github.com/gjarunselvan/springboot-jenkins-eks.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git config remote.origin.url https://github.com/gjarunselvan/springboot-jenkins-eks.git # timeout=10
+ > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
+Avoid second fetch
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision f591c022b3132c5185546d5a5af0bfe18ede95ef (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f f591c022b3132c5185546d5a5af0bfe18ede95ef # timeout=10
+Commit message: "Update Jenkinsfile"
+First time build. Skipping changelog.
+org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:
+WorkflowScript: 4: unexpected char: '`' @ line 4, column 1.
+   ```
+   ^
 
-aws ecr get-login-password --region us-east-2 | \
-docker login \
---username AWS \
---password-stdin \
-761018881666.dkr.ecr.us-east-2.amazonaws.com
+1 error
 
-docker tag springboot-app:latest \
-761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
-
-docker push \
-761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
-DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
-            Install the buildx component to build images with BuildKit:
-            https://docs.docker.com/go/buildx/
-
-unable to prepare context: unable to evaluate symlinks in Dockerfile path: lstat /home/ubuntu/Dockerfile: no such file or directory
-
-WARNING! Your credentials are stored unencrypted in '/home/ubuntu/.docker/config.json'.
-Configure a credential helper to remove this warning. See
-https://docs.docker.com/go/credential-store/
-
-Login Succeeded
-Error response from daemon: No such image: springboot-app:latest
-The push refers to repository [761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo]
-tag does not exist: 761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
-ubuntu@ip-172-31-39-80:~$ 
-
+	at org.codehaus.groovy.control.ErrorCollector.failIfErrors(ErrorCollector.java:309)
+	at org.codehaus.groovy.control.ErrorCollector.addFatalError(ErrorCollector.java:149)
+	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:119)
+	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:131)
+	at org.codehaus.groovy.control.SourceUnit.addError(SourceUnit.java:349)
+	at org.codehaus.groovy.antlr.AntlrParserPlugin.transformCSTIntoAST(AntlrParserPlugin.java:220)
+	at org.codehaus.groovy.antlr.AntlrParserPlugin.parseCST(AntlrParserPlugin.java:191)
+	at org.codehaus.groovy.control.SourceUnit.parse(SourceUnit.java:233)
+	at org.codehaus.groovy.control.CompilationUnit$1.call(CompilationUnit.java:189)
+	at org.codehaus.groovy.control.CompilationUnit.applyToSourceUnits(CompilationUnit.java:966)
+	at org.codehaus.groovy.control.CompilationUnit.doPhaseOperation(CompilationUnit.java:626)
+	at org.codehaus.groovy.control.CompilationUnit.processPhaseOperations(CompilationUnit.java:602)
+	at org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:579)
+	at groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:323)
+	at groovy.lang.GroovyClassLoader.parseClass(GroovyClassLoader.java:293)
+	at PluginClassLoader for script-security//org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.GroovySandbox$Scope.parse(GroovySandbox.java:162)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsGroovyShell.doParse(CpsGroovyShell.java:202)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsGroovyShell.reparse(CpsGroovyShell.java:186)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsFlowExecution.parseScript(CpsFlowExecution.java:670)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsFlowExecution.start(CpsFlowExecution.java:616)
+	at PluginClassLoader for workflow-job//org.jenkinsci.plugins.workflow.job.WorkflowRun.run(WorkflowRun.java:341)
+	at hudson.model.ResourceController.execute(ResourceController.java:101)
+	at hudson.model.Executor.run(Executor.java:454)
+Finished: FAILURE
