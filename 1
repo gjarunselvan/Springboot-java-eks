@@ -1,38 +1,31 @@
-=====================================
-PHASE 1 + PHASE 2 VALIDATION
-=====================================
+sudo apt update -y
 
-===== JAVA =====
-openjdk version "17.0.19" 2026-04-21
-OpenJDK Runtime Environment (build 17.0.19+10-1-26.04.2-Ubuntu)
-OpenJDK 64-Bit Server VM (build 17.0.19+10-1-26.04.2-Ubuntu, mixed mode, sharing)
+# Remove old Java if needed
+sudo apt remove -y openjdk-17-jdk
 
-===== AWS CLI =====
-aws-cli/2.35.8 Python/3.14.5 Linux/7.0.0-1006-aws exe/x86_64.ubuntu.26
+# Install Java 21
+sudo apt install -y openjdk-21-jdk
 
-===== KUBECTL =====
-Client Version: v1.36.2
-Kustomize Version: v5.8.1
+java -version
 
-===== EKSCTL =====
-0.227.0
+# Jenkins Repository Key
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | \
+sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
 
-===== DOCKER =====
-Docker version 29.1.3, build 29.1.3-0ubuntu4.1
+# Jenkins Repository
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | \
+sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
 
-===== JENKINS =====
-inactive
+sudo apt update -y
 
-===== IAM ROLE =====
-ec2-eks-role
+# Install latest Jenkins LTS
+sudo apt install -y jenkins
 
-===== SECURITY GROUP =====
-jenkins-server-security-group
+# Start Jenkins
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
 
-===== EC2 =====
---------------------------------
-|       DescribeInstances      |
-+-----------------+------------+
-|  jenkins-server |  t3.small  |
-+-----------------+------------+
-ubuntu@ip-172-31-47-234:~$ 
+# Verify
+java -version
+jenkins --version || dpkg -l | grep jenkins
+systemctl is-active jenkins
