@@ -1,4 +1,4 @@
-cat > fix-docker.sh << 'EOF'
+ubuntu@ip-172-31-47-234:~$ cat > fix-docker.sh << 'EOF'
 #!/bin/bash
 
 echo "=================================="
@@ -52,3 +52,36 @@ EOF
 
 chmod +x fix-docker.sh
 ./fix-docker.sh
+==================================
+DOCKER FIX FOR JENKINS
+==================================
+
+VERIFY GROUPS
+ubuntu : ubuntu adm cdrom sudo dip lxd docker
+jenkins : jenkins docker
+
+VERIFY DOCKER SOCKET
+srw-rw---- 1 root docker 0 Jun 19 12:57 /var/run/docker.sock
+
+TEST UBUNTU
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+TEST JENKINS
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+RESTART JENKINS
+
+JENKINS STATUS
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0
+HTTP/1.1 403 Forbidden
+Server: Jetty(12.1.8)
+Date: Fri, 19 Jun 2026 14:21:25 GMT
+X-Content-Type-Options: nosniff
+Reporting-Endpoints: content-security-policy: http://3.16.113.69:8080/content-security-policy-reporting-endpoint/Y5v_mrFpoVrYunha5xLYAqOZBaJeNO8o-2qHcH1LRKY=:YW5vbnltb3Vz::Lw==
+
+DONE - RUN BUILD NOW
+[3]+  Exit 143                   nohup java -jar ~/jenkins/jenkins.war --httpPort=8080 > ~/jenkins/jenkins.log 2>&1
+ubuntu@ip-172-31-47-234:~$ 
+
