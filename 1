@@ -1,50 +1,56 @@
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  4.313 s
-[INFO] Finished at: 2026-06-19T14:23:08Z
-[INFO] ------------------------------------------------------------------------
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Docker Build)
-[Pipeline] tool
-[Pipeline] envVarsForTool
-[Pipeline] withEnv
-[Pipeline] {
-[Pipeline] sh
-+ docker build -t springboot-app .
-DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
-            Install the buildx component to build images with BuildKit:
-            https://docs.docker.com/go/buildx/
+#!/bin/bash
 
-permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (ECR Login)
-Stage "ECR Login" skipped due to earlier failure(s)
-[Pipeline] getContext
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Docker Push)
-Stage "Docker Push" skipped due to earlier failure(s)
-[Pipeline] getContext
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 1
-Finished: FAILURE
+echo "=================================="
+echo "FULL JENKINS RESTART"
+echo "=================================="
+
+pkill -9 -f jenkins.war || true
+
+sleep 5
+
+echo ""
+echo "VERIFY UBUNTU GROUPS"
+id ubuntu
+
+echo ""
+echo "VERIFY DOCKER"
+docker ps
+
+echo ""
+echo "START JENKINS"
+
+nohup java -jar /home/ubuntu/jenkins/jenkins.war \
+--httpPort=8080 \
+> /home/ubuntu/jenkins/jenkins.log 2>&1 &
+
+echo ""
+echo "WAIT 30 SECONDS"
+sleep 30
+
+echo ""
+echo "VERIFY PROCESS"
+ps -ef | grep jenkins.war | grep -v grep
+
+echo ""
+echo "VERIFY PORT"
+ss -tulpn | grep 8080
+
+echo ""
+echo "VERIFY WEB"
+curl -I http://localhost:8080 | head -5
+
+echo ""
+echo "VERIFY PROCESS GROUPS"
+PID=$(pgrep -f jenkins.war | head -1)
+
+ps -o user,pid,cmd -p $PID
+
+echo ""
+echo "=================================="
+echo "READY"
+echo "=================================="
+echo "1. Logout Jenkins"
+echo "2. Close browser"
+echo "3. Open Jenkins again"
+echo "4. Login"
+echo "5. Build Now"
