@@ -1,79 +1,54 @@
-ubuntu@ip-172-31-47-234:~$ #!/bin/bash
+cat > fix-docker.sh << 'EOF'
+#!/bin/bash
 
 echo "=================================="
-echo "CREATE JENKINS USER"
+echo "DOCKER FIX FOR JENKINS"
 echo "=================================="
 
-if id "jenkins" >/dev/null 2>&1; then
-    echo "jenkins user already exists"
-else
-    sudo useradd -m -s /bin/bash jenkins
-    echo "jenkins user created"
-fi
-
-echo ""
-echo "=================================="
-echo "ADD TO DOCKER GROUP"
-echo "=================================="
-
+sudo usermod -aG docker ubuntu
 sudo usermod -aG docker jenkins
 
-echo ""
-echo "=================================="
-echo "RESTART DOCKER"
-echo "=================================="
+sudo chown root:docker /var/run/docker.sock
+sudo chmod 660 /var/run/docker.sock
 
 sudo systemctl restart docker
 
 echo ""
-echo "=================================="
-echo "VERIFY USER"
-echo "=================================="
-
-id jenkins
+echo "VERIFY GROUPS"
+groups ubuntu
+groups jenkins
 
 echo ""
-echo "=================================="
-echo "VERIFY DOCKER ACCESS"
-echo "=================================="
+echo "VERIFY DOCKER SOCKET"
+ls -l /var/run/docker.sock
 
+echo ""
+echo "TEST UBUNTU"
+newgrp docker << EONG
+docker ps
+EONG
+
+echo ""
+echo "TEST JENKINS"
 sudo su - jenkins -c "docker ps"
 
 echo ""
-echo "=================================="
-echo "RESULT"
-echo "=================================="
+echo "RESTART JENKINS"
+pkill -f jenkins.war || true
 
-echo "If docker ps works, Jenkins user is ready."
-==================================
-CREATE JENKINS USER
-==================================
-jenkins user created
+nohup java -jar /home/ubuntu/jenkins/jenkins.war \
+--httpPort=8080 \
+> /home/ubuntu/jenkins/jenkins.log 2>&1 &
 
-==================================
-ADD TO DOCKER GROUP
-==================================
+sleep 20
 
-==================================
-RESTART DOCKER
-==================================
+echo ""
+echo "JENKINS STATUS"
+curl -I http://localhost:8080 | head -5
 
-==================================
-VERIFY USER
-==================================
-uid=1001(jenkins) gid=1001(jenkins) groups=1001(jenkins),109(docker)
+echo ""
+echo "DONE - RUN BUILD NOW"
+EOF
 
-==================================
-VERIFY DOCKER ACCESS
-==================================
-CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
-
-==================================
-RESULT
-==================================
-If docker ps works, Jenkins user is ready.
-ubuntu@ip-172-31-47-234:~$ docker ps
-permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
-ubuntu@ip-172-31-47-234:~$ sudo docker ps
-CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
-ubuntu@ip-172-31-47-234:~$ 
+chmod +x fix-docker.sh
+./fix-docker.sh
