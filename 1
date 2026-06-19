@@ -1,107 +1,56 @@
-ubuntu@ip-172-31-39-80:~$ #!/bin/bash
+#!/bin/bash
 
-echo "===== DISK USAGE BEFORE ====="
-df -h
+echo "======================================"
+echo "ECR IMAGES"
+echo "======================================"
 
-echo "===== STOP JENKINS ====="
-sudo systemctl stop jenkins
+aws ecr list-images \
+--repository-name springboot-jenkins-ecr-repo \
+--region us-east-2
 
-echo "===== CLEAN TEMP ====="
-sudo rm -rf /tmp/*
-sudo rm -rf /var/tmp/*
+echo ""
+echo "======================================"
+echo "DEPLOYMENTS"
+echo "======================================"
 
-echo "===== CLEAN APT ====="
-sudo apt-get clean
-sudo apt-get autoclean -y
-sudo apt-get autoremove -y
+kubectl get deployments
 
-echo "===== CLEAN JENKINS WORKSPACE ====="
-sudo rm -rf /var/lib/jenkins/workspace/*
+echo ""
+echo "======================================"
+echo "PODS"
+echo "======================================"
 
-echo "===== CLEAN DOCKER ====="
-docker system prune -af --volumes
+kubectl get pods -o wide
 
-echo "===== START JENKINS ====="
-sudo systemctl start jenkins
+echo ""
+echo "======================================"
+echo "SERVICES"
+echo "======================================"
 
-echo "===== WAITING 30 SEC ====="
-sleep 30
+kubectl get svc
 
-echo "===== JENKINS STATUS ====="
-sudo systemctl status jenkins --no-pager
+echo ""
+echo "======================================"
+echo "NODES"
+echo "======================================"
 
-echo "===== DISK USAGE AFTER ====="
-df -h
-===== DISK USAGE BEFORE =====
-Filesystem       Size  Used Avail Use% Mounted on
-/dev/root        6.7G  4.6G  2.1G  69% /
-tmpfs            953M     0  953M   0% /dev/shm
-tmpfs            382M  964K  381M   1% /run
-efivarfs         128K  3.1K  120K   3% /sys/firmware/efi/efivars
-tmpfs            953M  4.5M  949M   1% /tmp
-/dev/nvme0n1p13  989M   96M  827M  11% /boot
-/dev/nvme0n1p15  105M  6.3M   99M   7% /boot/efi
-none             1.0M     0  1.0M   0% /run/credentials/serial-getty@ttyS0.service
-none             1.0M     0  1.0M   0% /run/credentials/getty@tty1.service
-tmpfs            191M  8.0K  191M   1% /run/user/1000
-none             1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
-none             1.0M     0  1.0M   0% /run/credentials/systemd-resolved.service
-none             1.0M     0  1.0M   0% /run/credentials/systemd-networkd.service
-===== STOP JENKINS =====
-===== CLEAN TEMP =====
-===== CLEAN APT =====
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
-Solving dependencies... Done
-0 upgraded, 0 newly installed, 0 to remove and 1 not upgraded.
-===== CLEAN JENKINS WORKSPACE =====
-===== CLEAN DOCKER =====
-Deleted Networks:
-jenkins_network
+kubectl get nodes -o wide
 
-Total reclaimed space: 0B
-===== START JENKINS =====
-===== WAITING 30 SEC =====
-===== JENKINS STATUS =====
-● jenkins.service - Jenkins Continuous Integration Server
-     Loaded: loaded (/usr/lib/systemd/system/jenkins.service; enabled; preset: enabled)
-     Active: active (running) since Fri 2026-06-19 11:49:22 UTC; 30s ago
- Invocation: 7021a7dde3e34920b5841e25f8b705b9
-   Main PID: 19981 (java)
-      Tasks: 60 (limit: 1741)
-     Memory: 589.3M (peak: 598.7M)
-        CPU: 40.904s
-     CGroup: /system.slice/jenkins.service
-             └─19981 /usr/bin/java -Djava.awt.headless=true -jar /usr/share/java/jenkins.war --webroot=/var/cache/jenkins/war…
+echo ""
+echo "======================================"
+echo "JENKINS STATUS"
+echo "======================================"
 
-Jun 19 11:49:20 ip-172-31-39-80 jenkins[19981]: 2026-06-19 11:49:20.467+0000 [id=29]        INFO        jenkins.InitR… plugins
-Jun 19 11:49:20 ip-172-31-39-80 jenkins[19981]: 2026-06-19 11:49:20.539+0000 [id=32]        INFO        jenkins.InitR… plugins
-Jun 19 11:49:20 ip-172-31-39-80 jenkins[19981]: 2026-06-19 11:49:20.547+0000 [id=30]        INFO        jenkins.InitR…tensions
-Jun 19 11:49:22 ip-172-31-39-80 jenkins[19981]: 2026-06-19 11:49:22.666+0000 [id=30]        INFO        jenkins.InitR…g loaded
-Jun 19 11:49:22 ip-172-31-39-80 jenkins[19981]: 2026-06-19 11:49:22.668+0000 [id=31]        INFO        jenkins.InitR… adapted
-Jun 19 11:49:22 ip-172-31-39-80 jenkins[19981]: 2026-06-19 11:49:22.739+0000 [id=31]        INFO        jenkins.InitR…all jobs
-Jun 19 11:49:22 ip-172-31-39-80 jenkins[19981]: 2026-06-19 11:49:22.744+0000 [id=31]        INFO        jenkins.InitR… updated
-Jun 19 11:49:22 ip-172-31-39-80 jenkins[19981]: 2026-06-19 11:49:22.898+0000 [id=29]        INFO        jenkins.InitR…lization
-Jun 19 11:49:22 ip-172-31-39-80 jenkins[19981]: 2026-06-19 11:49:22.955+0000 [id=23]        INFO        hudson.lifecy… running
-Jun 19 11:49:22 ip-172-31-39-80 systemd[1]: Started jenkins.service - Jenkins Continuous Integration Server.
-Hint: Some lines were ellipsized, use -l to show in full.
-===== DISK USAGE AFTER =====
-Filesystem       Size  Used Avail Use% Mounted on
-/dev/root        6.7G  4.7G  2.0G  71% /
-tmpfs            953M     0  953M   0% /dev/shm
-tmpfs            382M  956K  381M   1% /run
-efivarfs         128K  3.1K  120K   3% /sys/firmware/efi/efivars
-tmpfs            953M  4.5M  949M   1% /tmp
-/dev/nvme0n1p13  989M   96M  827M  11% /boot
-/dev/nvme0n1p15  105M  6.3M   99M   7% /boot/efi
-none             1.0M     0  1.0M   0% /run/credentials/serial-getty@ttyS0.service
-none             1.0M     0  1.0M   0% /run/credentials/getty@tty1.service
-tmpfs            191M  8.0K  191M   1% /run/user/1000
-none             1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
-none             1.0M     0  1.0M   0% /run/credentials/systemd-resolved.service
-none             1.0M     0  1.0M   0% /run/credentials/systemd-networkd.service
-ubuntu@ip-172-31-39-80:~$ 
+sudo systemctl is-active jenkins
+
+echo ""
+echo "======================================"
+echo "DOCKER STATUS"
+echo "======================================"
+
+sudo systemctl is-active docker
+
+echo ""
+echo "======================================"
+echo "DONE"
+echo "======================================"
