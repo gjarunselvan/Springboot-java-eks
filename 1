@@ -1,74 +1,122 @@
 #!/bin/bash
 
-echo "=================================="
-echo "CREATE JENKINS DIRECTORY"
-echo "=================================="
+PASS=0
+TOTAL=13
 
-mkdir -p $HOME/jenkins
+echo "======================================"
+echo "      NEVO LAB VALIDATION"
+echo "======================================"
 
-echo ""
-echo "=================================="
-echo "DOWNLOAD JENKINS"
-echo "=================================="
+check_pass() {
+  echo "PASS"
+  PASS=$((PASS+1))
+}
 
-cd $HOME/jenkins
-
-curl -L -o jenkins.war \
-https://get.jenkins.io/war-stable/latest/jenkins.war
-
-echo ""
-echo "=================================="
-echo "START JENKINS"
-echo "=================================="
-
-nohup java -jar $HOME/jenkins/jenkins.war \
---httpPort=8080 \
-> $HOME/jenkins/jenkins.log 2>&1 &
+check_fail() {
+  echo "FAIL"
+}
 
 echo ""
-echo "WAITING 60 SECONDS..."
-sleep 60
+echo "1. EC2 NAME = jenkins-server"
+
+EC2=$(aws ec2 describe-instances \
+--filters "Name=tag:Name,Values=jenkins-server" \
+"Name=instance-state-name,Values=running" \
+--query 'Reservations[*].Instances[*].Tags[?Key==`Name`].Value|[0]' \
+--output text 2>/dev/null)
+
+[ "$EC2" = "jenkins-server" ] && check_pass || check_fail
 
 echo ""
-echo "=================================="
-echo "PROCESS CHECK"
-echo "=================================="
+echo "2. INSTANCE TYPE = t3.small"
 
-ps -ef | grep jenkins.war
+TYPE=$(aws ec2 describe-instances \
+--filters "Name=tag:Name,Values=jenkins-server" \
+--query 'Reservations[*].Instances[*].InstanceType' \
+--output text 2>/dev/null)
 
-echo ""
-echo "=================================="
-echo "PORT CHECK"
-echo "=================================="
-
-ss -tulpn | grep 8080
+[ "$TYPE" = "t3.small" ] && check_pass || check_fail
 
 echo ""
-echo "=================================="
-echo "HTTP CHECK"
-echo "=================================="
+echo "3. IAM ROLE = ec2-eks-role"
 
-curl -I http://localhost:8080
-
-echo ""
-echo "=================================="
-echo "LAST 20 LOG LINES"
-echo "=================================="
-
-tail -20 $HOME/jenkins/jenkins.log
+aws iam get-role --role-name ec2-eks-role >/dev/null 2>&1
+[ $? -eq 0 ] && check_pass || check_fail
 
 echo ""
-echo "=================================="
-echo "EKS STATUS"
-echo "=================================="
+echo "4. SECURITY GROUP = jenkins-server-security-group"
 
-aws eks describe-cluster \
---name jenkins-cluster \
---region us-east-2 \
---query 'cluster.status' \
---output text
+SG=$(aws ec2 describe-security-groups \
+--filters Name=group-name,Values=jenkins-server-security-group \
+--query 'SecurityGroups[*].GroupName' \
+--output text 2>/dev/null)
+
+[ "$SG" = "jenkins-server-security-group" ] && check_pass || check_fail
 
 echo ""
-echo "=================================="
-echo "DONE"
-echo "=================================="
+echo "5. JAVA"
+
+java -version >/dev/null 2>&1
+[ $? -eq 0 ] && check_pass || check_fail
+
+echo ""
+echo "6. AWS CLI"
+
+aws --version >/dev/null 2>&1
+[ $? -eq 0 ] && check_pass || check_fail
+
+echo ""
+echo "7. KUBECTL"
+
+kubectl version --client >/dev/null 2>&1
+[ $? -eq 0 ] && check_pass || check_fail
+
+echo ""
+echo "8. EKSCTL"
+
+eksctl version >/dev/null 2>&1
+[ $? -eq 0 ] && check_pass || check_fail
+
+echo ""
+echo "9. DOCKER"
+
+docker --version >/dev/null 2>&1
+[ $? -eq 0 ] && check_pass || check_fail
+
+echo ""
+echo "10. JENKINS"
+
+curl -s http://localhost:8080 >/dev/null 2>&1
+[ $? -eq 0 ] && check_pass || check_fail
+
+echo ""
+echo "11. DOCKER VOLUME"
+
+sudo docker volume ls | grep -q jenkins_data
+[ $? -eq 0 ] && check_pass || check_fail
+
+echo ""
+echo "12. DOCKER NETWORK"
+
+sudo docker network ls | grep -q jenkins_network
+[ $? -eq 0 ] && check_pass || check_fail
+
+echo ""
+echo "13. ECR"
+
+aws ecr describe-repositories \
+--repository-names springboot-jenkins-ecr-repo \
+--region us-east-2 >/dev/null 2>&1
+
+[ $? -eq 0 ] && check_pass || check_fail
+
+echo ""
+echo "======================================"
+echo "SCORE : $PASS / $TOTAL"
+echo "======================================"
+
+if [ "$PASS" -ge 11 ]; then
+  echo "READY FOR NEXT PHASE"
+else
+  echo "FIX FAILURES FIRST"
+fi
