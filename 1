@@ -1,233 +1,82 @@
-#!/bin/bash
+======================================
+ NUVEPRO FINAL LAB VALIDATION
+======================================
 
-SCORE=0
-TOTAL=15
+1. EC2 INSTANCE TYPE
+INSTANCE TYPE = 
+FAIL
 
-echo "======================================"
-echo " NUVEPRO FINAL LAB VALIDATION"
-echo "======================================"
+2. IAM ROLE
+FAIL
 
-echo ""
-echo "1. EC2 INSTANCE TYPE"
-TYPE=$(curl -s http://169.254.169.254/latest/meta-data/instance-type)
-echo "INSTANCE TYPE = $TYPE"
+3. JAVA
+PASS
 
-if [ "$TYPE" = "t3.small" ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
+4. AWS CLI
+PASS
 
-echo ""
-echo "2. IAM ROLE"
-ROLE=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/)
+5. DOCKER
+PASS
 
-if [ ! -z "$ROLE" ]; then
-  echo "ROLE = $ROLE"
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
+6. KUBECTL
+PASS
 
-echo ""
-echo "3. JAVA"
-java -version >/dev/null 2>&1
+7. EKSCTL
+PASS
 
-if [ $? -eq 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
+8. JENKINS
+PASS
 
-echo ""
-echo "4. AWS CLI"
+9. ECR REPOSITORY
+PASS
 
-aws --version >/dev/null 2>&1
+10. EKS CLUSTER
+STATUS = ACTIVE
+PASS
 
-if [ $? -eq 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
+11. NODEGROUP
+PASS
 
-echo ""
-echo "5. DOCKER"
+12. K8S NODES
+PASS
 
-docker --version >/dev/null 2>&1
+13. ECR IMAGE
+IMAGE COUNT = 0
+FAIL
 
-if [ $? -eq 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
+14. SPRINGBOOT DEPLOYMENT
+FAIL
 
-echo ""
-echo "6. KUBECTL"
+15. LOAD BALANCER SERVICE
+FAIL
 
-kubectl version --client >/dev/null 2>&1
+======================================
+FINAL SCORE : 10 / 15
+======================================
 
-if [ $? -eq 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
+===== DEPLOYMENTS =====
 
-echo ""
-echo "7. EKSCTL"
+===== PODS =====
+NAMESPACE     NAME                             READY   STATUS    RESTARTS   AGE
+kube-system   aws-node-2jz89                   2/2     Running   0          35m
+kube-system   aws-node-sjsgc                   2/2     Running   0          35m
+kube-system   coredns-6d6c454fdb-fsdz7         1/1     Running   0          38m
+kube-system   coredns-6d6c454fdb-q9l44         1/1     Running   0          38m
+kube-system   kube-proxy-rwbvl                 1/1     Running   0          35m
+kube-system   kube-proxy-vqlzz                 1/1     Running   0          35m
+kube-system   metrics-server-7c4574785-qxwj4   1/1     Running   0          34m
+kube-system   metrics-server-7c4574785-wg562   1/1     Running   0          34m
 
-eksctl version >/dev/null 2>&1
+===== SERVICES =====
+NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.100.0.1   <none>        443/TCP   41m
 
-if [ $? -eq 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
+===== ECR IMAGES =====
+{
+    "imageIds": []
+}
 
-echo ""
-echo "8. JENKINS"
-
-curl -s http://localhost:8080/login >/dev/null
-
-if [ $? -eq 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
-
-echo ""
-echo "9. ECR REPOSITORY"
-
-aws ecr describe-repositories \
---repository-names springboot-jenkins-ecr-repo \
---region us-east-2 >/dev/null 2>&1
-
-if [ $? -eq 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
-
-echo ""
-echo "10. EKS CLUSTER"
-
-STATUS=$(aws eks describe-cluster \
---name jenkins-cluster \
---region us-east-2 \
---query cluster.status \
---output text 2>/dev/null)
-
-echo "STATUS = $STATUS"
-
-if [ "$STATUS" = "ACTIVE" ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
-
-echo ""
-echo "11. NODEGROUP"
-
-aws eks list-nodegroups \
---cluster-name jenkins-cluster \
---region us-east-2 \
---query 'nodegroups[0]' \
---output text | grep -q jenkins-nodegroup
-
-if [ $? -eq 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
-
-echo ""
-echo "12. K8S NODES"
-
-kubectl get nodes --no-headers 2>/dev/null | grep -q Ready
-
-if [ $? -eq 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
-
-echo ""
-echo "13. ECR IMAGE"
-
-COUNT=$(aws ecr list-images \
---repository-name springboot-jenkins-ecr-repo \
---region us-east-2 \
---query 'length(imageIds)' \
---output text 2>/dev/null)
-
-echo "IMAGE COUNT = $COUNT"
-
-if [ "$COUNT" -gt 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
-
-echo ""
-echo "14. SPRINGBOOT DEPLOYMENT"
-
-kubectl get deployment springboot-app >/dev/null 2>&1
-
-if [ $? -eq 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
-
-echo ""
-echo "15. LOAD BALANCER SERVICE"
-
-kubectl get svc | grep -q LoadBalancer
-
-if [ $? -eq 0 ]; then
-  echo "PASS"
-  SCORE=$((SCORE+1))
-else
-  echo "FAIL"
-fi
-
-echo ""
-echo "======================================"
-echo "FINAL SCORE : $SCORE / $TOTAL"
-echo "======================================"
-
-echo ""
-echo "===== DEPLOYMENTS ====="
-kubectl get deployment 2>/dev/null
-
-echo ""
-echo "===== PODS ====="
-kubectl get pods -A 2>/dev/null
-
-echo ""
-echo "===== SERVICES ====="
-kubectl get svc 2>/dev/null
-
-echo ""
-echo "===== ECR IMAGES ====="
-aws ecr list-images \
---repository-name springboot-jenkins-ecr-repo \
---region us-east-2 2>/dev/null
-
-echo ""
-echo "======================================"
-echo "DONE"
-echo "======================================"
+======================================
+DONE
+======================================
+ubuntu@ip-172-31-47-234:~$ 
