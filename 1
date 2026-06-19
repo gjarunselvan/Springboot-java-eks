@@ -1,49 +1,38 @@
-#!/bin/bash
+=====================================
+PHASE 1 + PHASE 2 VALIDATION
+=====================================
 
-echo "====================================="
-echo "PHASE 1 + PHASE 2 VALIDATION"
-echo "====================================="
+===== JAVA =====
+openjdk version "17.0.19" 2026-04-21
+OpenJDK Runtime Environment (build 17.0.19+10-1-26.04.2-Ubuntu)
+OpenJDK 64-Bit Server VM (build 17.0.19+10-1-26.04.2-Ubuntu, mixed mode, sharing)
 
-echo ""
-echo "===== JAVA ====="
-java -version | head -1
+===== AWS CLI =====
+aws-cli/2.35.8 Python/3.14.5 Linux/7.0.0-1006-aws exe/x86_64.ubuntu.26
 
-echo ""
-echo "===== AWS CLI ====="
-aws --version
+===== KUBECTL =====
+Client Version: v1.36.2
+Kustomize Version: v5.8.1
 
-echo ""
-echo "===== KUBECTL ====="
-kubectl version --client
+===== EKSCTL =====
+0.227.0
 
-echo ""
-echo "===== EKSCTL ====="
-eksctl version
+===== DOCKER =====
+Docker version 29.1.3, build 29.1.3-0ubuntu4.1
 
-echo ""
-echo "===== DOCKER ====="
-docker --version
+===== JENKINS =====
+inactive
 
-echo ""
-echo "===== JENKINS ====="
-systemctl is-active jenkins
+===== IAM ROLE =====
+ec2-eks-role
 
-echo ""
-echo "===== IAM ROLE ====="
-aws iam get-role --role-name ec2-eks-role \
---query 'Role.RoleName' \
---output text
+===== SECURITY GROUP =====
+jenkins-server-security-group
 
-echo ""
-echo "===== SECURITY GROUP ====="
-aws ec2 describe-security-groups \
---filters Name=group-name,Values=jenkins-server-security-group \
---query 'SecurityGroups[*].GroupName' \
---output text
-
-echo ""
-echo "===== EC2 ====="
-aws ec2 describe-instances \
---filters Name=instance-state-name,Values=running \
---query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value|[0],InstanceType]' \
---output table
+===== EC2 =====
+--------------------------------
+|       DescribeInstances      |
++-----------------+------------+
+|  jenkins-server |  t3.small  |
++-----------------+------------+
+ubuntu@ip-172-31-47-234:~$ 
