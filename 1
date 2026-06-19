@@ -1,4 +1,4 @@
-#!/bin/bash
+ubuntu@ip-172-31-47-234:~$ #!/bin/bash
 
 echo "=================================="
 echo "CREATE JENKINS USER"
@@ -45,3 +45,35 @@ echo "RESULT"
 echo "=================================="
 
 echo "If docker ps works, Jenkins user is ready."
+==================================
+CREATE JENKINS USER
+==================================
+jenkins user created
+
+==================================
+ADD TO DOCKER GROUP
+==================================
+
+==================================
+RESTART DOCKER
+==================================
+
+==================================
+VERIFY USER
+==================================
+uid=1001(jenkins) gid=1001(jenkins) groups=1001(jenkins),109(docker)
+
+==================================
+VERIFY DOCKER ACCESS
+==================================
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+==================================
+RESULT
+==================================
+If docker ps works, Jenkins user is ready.
+ubuntu@ip-172-31-47-234:~$ docker ps
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+ubuntu@ip-172-31-47-234:~$ sudo docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+ubuntu@ip-172-31-47-234:~$ 
