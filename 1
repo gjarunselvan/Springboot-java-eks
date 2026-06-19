@@ -1,5 +1,14 @@
-kubectl get nodes
-NAME                                           STATUS   ROLES    AGE   VERSION
-ip-192-168-5-186.us-east-2.compute.internal    Ready    <none>   43m   v1.34.9-eks-93b80c6
-ip-192-168-59-165.us-east-2.compute.internal   Ready    <none>   43m   v1.34.9-eks-93b80c6
-ubuntu@ip-172-31-39-80:~$ 
+echo "===== DEPLOYMENT ====="
+kubectl get deployment springboot-app
+
+echo ""
+echo "===== PODS ====="
+kubectl get pods -o wide
+
+echo ""
+echo "===== SERVICE ====="
+kubectl get svc
+
+echo ""
+echo "===== LOAD BALANCER ====="
+kubectl get svc springboot-service
