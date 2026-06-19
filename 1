@@ -1,75 +1,124 @@
-======================================
-NUVEPRO LAB VALIDATION
-======================================
+#!/bin/bash
 
-1. JAVA
-[PASS] Java Installed
+echo "======================================"
+echo "NUVEPRO FINAL LAB VALIDATION"
+echo "======================================"
 
-2. MAVEN
-[PASS] Maven Installed
+echo ""
+echo "1. EC2 INSTANCE"
 
-3. AWS CLI
-[PASS] AWS CLI Installed
+INSTANCE_TYPE=$(curl -s http://169.254.169.254/latest/meta-data/instance-type)
 
-4. DOCKER
-[PASS] Docker Installed
+echo "INSTANCE TYPE = $INSTANCE_TYPE"
 
-5. KUBECTL
-[PASS] kubectl Installed
+if [ "$INSTANCE_TYPE" = "t3.small" ]; then
+echo "PASS"
+else
+echo "FAIL"
+fi
 
-6. EKSCTL
-[PASS] eksctl Installed
+echo ""
+echo "2. IAM ROLE"
 
-7. JENKINS SERVICE
-[FAIL] Jenkins Running
+ROLE=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/)
 
-8. JENKINS VOLUME
-[FAIL] jenkins_data Exists
+echo "ROLE = $ROLE"
 
-9. JENKINS NETWORK
-[FAIL] jenkins_network Exists
+if [ "$ROLE" = "ec2-eks-role" ]; then
+echo "PASS"
+else
+echo "FAIL"
+fi
 
-10. JENKINS USER
-[FAIL] jenkins User Exists
+echo ""
+echo "3. JAVA"
+java -version >/dev/null 2>&1 && echo PASS || echo FAIL
 
-11. JENKINS IN DOCKER GROUP
-[FAIL] jenkins in docker group
+echo ""
+echo "4. AWS CLI"
+aws --version >/dev/null 2>&1 && echo PASS || echo FAIL
 
-12. AWS IDENTITY
-[PASS] AWS Configured
+echo ""
+echo "5. DOCKER"
+docker --version >/dev/null 2>&1 && echo PASS || echo FAIL
 
-13. ECR REPO
-[FAIL] ECR Exists
+echo ""
+echo "6. KUBECTL"
+kubectl version --client >/dev/null 2>&1 && echo PASS || echo FAIL
 
-14. EKS CLUSTER
-[FAIL] EKS Exists
+echo ""
+echo "7. EKSCTL"
+eksctl version >/dev/null 2>&1 && echo PASS || echo FAIL
 
-15. NODEGROUP
-[FAIL] Nodegroup Exists
+echo ""
+echo "8. JENKINS"
+systemctl is-active jenkins >/dev/null 2>&1 && echo PASS || echo FAIL
 
-16. K8S NODES
-[FAIL] Kubernetes Nodes Ready
+echo ""
+echo "9. JENKINS USER"
 
-======================================
-SCORE
-======================================
-7 / 16
+id jenkins >/dev/null 2>&1 && echo PASS || echo FAIL
 
-======================================
-DETAILS
-======================================
-Docker Version:
-Docker version 29.1.3, build 29.1.3-0ubuntu4.1
+echo ""
+echo "10. DOCKER GROUP"
 
-eksctl:
-0.227.0
+groups jenkins | grep docker >/dev/null 2>&1 && echo PASS || echo FAIL
 
-Jenkins:
-inactive
+echo ""
+echo "11. DOCKER VOLUME"
 
-Volumes:
-permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+sudo docker volume inspect jenkins_data >/dev/null 2>&1 && echo PASS || echo FAIL
 
-Networks:
-permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
-ubuntu@ip-172-31-34-211:/tmp$ 
+echo ""
+echo "12. DOCKER NETWORK"
+
+sudo docker network inspect jenkins_network >/dev/null 2>&1 && echo PASS || echo FAIL
+
+echo ""
+echo "13. ECR REPOSITORY"
+
+aws ecr describe-repositories 
+--repository-names springboot-jenkins-ecr-repo 
+--region us-east-2 >/dev/null 2>&1 && echo PASS || echo FAIL
+
+echo ""
+echo "14. EKS CLUSTER"
+
+aws eks describe-cluster 
+--name jenkins-cluster 
+--region us-east-2 >/dev/null 2>&1 && echo PASS || echo FAIL
+
+echo ""
+echo "15. NODEGROUP"
+
+aws eks describe-nodegroup 
+--cluster-name jenkins-cluster 
+--nodegroup-name jenkins-nodegroup 
+--region us-east-2 >/dev/null 2>&1 && echo PASS || echo FAIL
+
+echo ""
+echo "16. K8S NODES"
+
+kubectl get nodes >/dev/null 2>&1 && echo PASS || echo FAIL
+
+echo ""
+echo "17. ECR IMAGE"
+
+aws ecr list-images 
+--repository-name springboot-jenkins-ecr-repo 
+--region us-east-2
+
+echo ""
+echo "18. SPRINGBOOT DEPLOYMENT"
+
+kubectl get deployment springboot-app-sample
+
+echo ""
+echo "19. LOADBALANCER SERVICE"
+
+kubectl get svc springboot-app
+
+echo ""
+echo "======================================"
+echo "DONE"
+echo "======================================"
