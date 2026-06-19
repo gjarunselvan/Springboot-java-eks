@@ -1,16 +1,33 @@
-ubuntu@ip-172-31-39-80:~$ #!/bin/bash
+#!/bin/bash
 
 echo "======================================"
-echo "STEP 1 - BUILD DOCKER IMAGE"
+echo "GO TO PROJECT"
 echo "======================================"
 
+cd ~/springboot-jenkins-eks || exit 1
+
+echo ""
+echo "CURRENT PATH"
+pwd
+
+echo ""
+echo "PROJECT FILES"
+ls -ltr
+
+echo ""
+echo "CHECK DOCKERFILE"
+ls Dockerfile
+
+echo ""
+echo "BUILD IMAGE"
 docker build -t springboot-app .
 
 echo ""
-echo "======================================"
-echo "STEP 2 - LOGIN TO ECR"
-echo "======================================"
+echo "VERIFY IMAGE"
+docker images | grep springboot
 
+echo ""
+echo "LOGIN TO ECR"
 aws ecr get-login-password --region us-east-2 | \
 docker login \
 --username AWS \
@@ -18,140 +35,28 @@ docker login \
 761018881666.dkr.ecr.us-east-2.amazonaws.com
 
 echo ""
-echo "======================================"
-echo "STEP 3 - TAG IMAGE"
-echo "======================================"
-
+echo "TAG IMAGE"
 docker tag springboot-app:latest \
 761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
 
 echo ""
-echo "======================================"
-echo "STEP 4 - PUSH IMAGE"
-echo "======================================"
-
+echo "PUSH IMAGE"
 docker push \
 761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
 
 echo ""
-echo "======================================"
-echo "STEP 5 - CREATE K8S DEPLOYMENT"
-echo "======================================"
+echo "RESTART DEPLOYMENT"
+kubectl rollout restart deployment springboot-app
 
-cat > eks-deploy-k8s.yaml <<EOF
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: springboot-app
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: springboot-app
-  template:
-    metadata:
-      labels:
-        app: springboot-app
-    spec:
-      containers:
-      - name: springboot-app
-        image: 761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
-        ports:
-        - containerPort: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: springboot-service
-spec:
-  selector:
-    app: springboot-app
-  type: LoadBalancer
-  ports:
-  - port: 80
-    targetPort: 8080
-EOF
+sleep 20
 
 echo ""
-echo "======================================"
-echo "STEP 6 - DEPLOY TO EKS"
-echo "======================================"
-
-kubectl apply -f eks-deploy-k8s.yaml
+echo "PODS"
+kubectl get pods -o wide
 
 echo ""
-echo "======================================"
-echo "STEP 7 - VERIFY"
-echo "======================================"
-
-kubectl get nodes
-
-echo ""
-kubectl get pods
-
-echo ""
+echo "SERVICE"
 kubectl get svc
 
 echo ""
-echo "======================================"
 echo "DONE"
-echo "======================================"
-======================================
-STEP 1 - BUILD DOCKER IMAGE
-======================================
-DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
-            Install the buildx component to build images with BuildKit:
-            https://docs.docker.com/go/buildx/
-
-unable to prepare context: unable to evaluate symlinks in Dockerfile path: lstat /home/ubuntu/Dockerfile: no such file or directory
-
-======================================
-STEP 2 - LOGIN TO ECR
-======================================
-
-WARNING! Your credentials are stored unencrypted in '/home/ubuntu/.docker/config.json'.
-Configure a credential helper to remove this warning. See
-https://docs.docker.com/go/credential-store/
-
-Login Succeeded
-
-======================================
-STEP 3 - TAG IMAGE
-======================================
-Error response from daemon: No such image: springboot-app:latest
-
-======================================
-STEP 4 - PUSH IMAGE
-======================================
-The push refers to repository [761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo]
-tag does not exist: 761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
-
-======================================
-STEP 5 - CREATE K8S DEPLOYMENT
-======================================
-
-======================================
-STEP 6 - DEPLOY TO EKS
-======================================
-deployment.apps/springboot-app created
-service/springboot-service created
-
-======================================
-STEP 7 - VERIFY
-======================================
-NAME                                           STATUS   ROLES    AGE     VERSION
-ip-192-168-5-186.us-east-2.compute.internal    Ready    <none>   9m54s   v1.34.9-eks-93b80c6
-ip-192-168-59-165.us-east-2.compute.internal   Ready    <none>   9m53s   v1.34.9-eks-93b80c6
-
-NAME                              READY   STATUS              RESTARTS   AGE
-springboot-app-864d4784dc-hhqzp   0/1     ContainerCreating   0          1s
-springboot-app-864d4784dc-pkqc5   0/1     ContainerCreating   0          1s
-
-NAME                 TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
-kubernetes           ClusterIP      10.100.0.1       <none>        443/TCP        15m
-springboot-service   LoadBalancer   10.100.194.153   <pending>     80:30103/TCP   1s
-
-======================================
-DONE
-======================================
-ubuntu@ip-172-31-39-80:~$ 
