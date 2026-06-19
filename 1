@@ -1,65 +1,59 @@
-#!/bin/bash
+==================================
+EC2 + IAM VALIDATION
+==================================
+curl: (2) no URL specified
+curl: try 'curl --help' or 'curl --manual' for more information
+-bash: http://169.254.169.254/latest/api/token: No such file or directory
+-H: command not found
 
-echo "=================================="
-echo "EC2 + IAM VALIDATION"
-echo "=================================="
+INSTANCE ID
+curl: (2) no URL specified
+curl: try 'curl --help' or 'curl --manual' for more information
+-H: command not found
+-bash: http://169.254.169.254/latest/meta-data/instance-id: No such file or directory
 
-TOKEN=$(curl -s -X PUT 
-"http://169.254.169.254/latest/api/token" 
--H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
-echo ""
-echo "INSTANCE ID"
-curl -s 
--H "X-aws-ec2-metadata-token: $TOKEN" 
-http://169.254.169.254/latest/meta-data/instance-id
+INSTANCE TYPE
+curl: (2) no URL specified
+curl: try 'curl --help' or 'curl --manual' for more information
+-H: command not found
+-bash: http://169.254.169.254/latest/meta-data/instance-type: No such file or directory
 
-echo ""
-echo ""
-echo "INSTANCE TYPE"
-curl -s 
--H "X-aws-ec2-metadata-token: $TOKEN" 
-http://169.254.169.254/latest/meta-data/instance-type
 
-echo ""
-echo ""
-echo "IAM ROLE"
-curl -s 
--H "X-aws-ec2-metadata-token: $TOKEN" 
-http://169.254.169.254/latest/meta-data/iam/security-credentials/
+IAM ROLE
+curl: (2) no URL specified
+curl: try 'curl --help' or 'curl --manual' for more information
+-H: command not found
+-bash: http://169.254.169.254/latest/meta-data/iam/security-credentials/: No such file or directory
 
-echo ""
-echo ""
-echo "AWS IDENTITY"
-aws sts get-caller-identity
 
-echo ""
-echo "AWS ARN"
-aws sts get-caller-identity 
---query Arn 
---output text
+AWS IDENTITY
+{
+    "UserId": "AROATHVQLNMZROODAWRNA:i-0e5aff41befcc5d21",
+    "Account": "222634404659",
+    "Arn": "arn:aws:sts::222634404659:assumed-role/ec2-role/i-0e5aff41befcc5d21"
+}
 
-echo ""
-echo "=================================="
-echo "RESULT"
-echo "=================================="
+AWS ARN
+{
+    "UserId": "AROATHVQLNMZROODAWRNA:i-0e5aff41befcc5d21",
+    "Account": "222634404659",
+    "Arn": "arn:aws:sts::222634404659:assumed-role/ec2-role/i-0e5aff41befcc5d21"
+}
+--query: command not found
+--output: command not found
 
-TYPE=$(curl -s 
--H "X-aws-ec2-metadata-token: $TOKEN" 
-http://169.254.169.254/latest/meta-data/instance-type)
-
-ROLE=$(curl -s 
--H "X-aws-ec2-metadata-token: $TOKEN" 
-http://169.254.169.254/latest/meta-data/iam/security-credentials/)
-
-if [ "$TYPE" = "t3.small" ]; then
-echo "EC2 CHECK = PASS"
-else
-echo "EC2 CHECK = FAIL ($TYPE)"
-fi
-
-if [ ! -z "$ROLE" ]; then
-echo "IAM ROLE CHECK = PASS ($ROLE)"
-else
-echo "IAM ROLE CHECK = FAIL"
-fi
+==================================
+RESULT
+==================================
+curl: (2) no URL specified
+curl: try 'curl --help' or 'curl --manual' for more information
+-H: command not found
+-bash: http://169.254.169.254/latest/meta-data/instance-type: No such file or directory
+curl: (2) no URL specified
+curl: try 'curl --help' or 'curl --manual' for more information
+-H: command not found
+-bash: http://169.254.169.254/latest/meta-data/iam/security-credentials/: No such file or directory
+EC2 CHECK = FAIL ()
+IAM ROLE CHECK = FAIL
+ubuntu@ip-172-31-34-211:/tmp$ 
