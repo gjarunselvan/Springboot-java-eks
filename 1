@@ -1,4 +1,4 @@
-sudo apt update -y
+ubuntu@ip-172-31-47-234:~$ sudo apt update -y
 
 # Remove old Java if needed
 sudo apt remove -y openjdk-17-jdk
@@ -29,3 +29,215 @@ sudo systemctl start jenkins
 java -version
 jenkins --version || dpkg -l | grep jenkins
 systemctl is-active jenkins
+Hit:1 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute InRelease
+Hit:2 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-updates InRelease
+Hit:3 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-backports InRelease
+Hit:4 http://security.ubuntu.com/ubuntu resolute-security InRelease
+17 packages can be upgraded. Run 'apt list --upgradable' to see them.
+The following packages were automatically installed and are no longer required:
+  adwaita-icon-theme          libasound2t64            libglx0                libsm-dev           libxinerama1
+  alsa-topology-conf          libatk-bridge2.0-0t64    libglycin-2-0          libsm6              libxkbfile1
+  alsa-ucm-conf               libatk-wrapper-java      libgraphite2-3         libthai-data        libxmu6
+  at-spi2-common              libatk-wrapper-java-jni  libgtk2.0-0t64         libthai0            libxpm4
+  at-spi2-core                libatk1.0-0t64           libgtk2.0-bin          libvulkan1          libxrandr2
+  bubblewrap                  libatspi2.0-0t64         libgtk2.0-common       libwayland-client0  libxrender1
+  ca-certificates-java        libavahi-client3         libharfbuzz0b          libx11-dev          libxres1
+  dconf-gsettings-backend     libavahi-common-data     libheif-plugin-aomdec  libx11-xcb1         libxshmfence1
+  dconf-service               libavahi-common3         libheif-plugin-aomenc  libxau-dev          libxt-dev
+  fontconfig                  libcairo-gobject2        libheif1               libxaw7             libxt6t64
+  fontconfig-config           libcairo2                libhwy1t64             libxcb-dri3-0       libxtst6
+  fonts-dejavu-core           libcups2t64              libibus-1.0-5          libxcb-glx0         libxv1
+  fonts-dejavu-extra          libdatrie1               libice-dev             libxcb-present0     libxxf86dga1
+  fonts-dejavu-mono           libdconf1                libice6                libxcb-randr0       libxxf86vm1
+  glycin-loaders              libdisplay-info3         libjpeg-turbo8         libxcb-render0      luit
+  glycin-thumbnailers         libdrm-intel1            libjpeg8               libxcb-shape0       mesa-libgallium
+  gnome-accessibility-themes  libfontconfig1           libjxl0.11             libxcb-shm0         mesa-vulkan-drivers
+  gnome-themes-extra          libgail-common           liblcms2-2             libxcb-sync1        openjdk-17-jdk-headless
+  gnome-themes-extra-data     libgail18t64             libpango-1.0-0         libxcb-xfixes0      openjdk-17-jre
+  gsettings-desktop-schemas   libgbm1                  libpangocairo-1.0-0    libxcb1-dev         openjdk-17-jre-headless
+  gtk-update-icon-cache       libgdk-pixbuf-2.0-0      libpangoft2-1.0-0      libxcomposite1      user-session-migration
+  gtk2-engines-pixbuf         libgdk-pixbuf2.0-common  libpciaccess0          libxcursor1         uuid-dev
+  hicolor-icon-theme          libgif7                  libpcsclite1           libxdamage1         x11-common
+  ibus-gtk                    libgl1                   libpixman-1-0          libxdmcp-dev        x11-utils
+  java-common                 libgl1-mesa-dri          librsvg2-2             libxfixes3          x11proto-dev
+  libaom3                     libglvnd0                librsvg2-common        libxft2             xorg-sgml-doctools
+  libasound2-data             libglx-mesa0             libsharpyuv0           libxi6              xtrans-dev
+Use 'sudo apt autoremove' to remove them.
+
+REMOVING:
+  openjdk-17-jdk
+
+Summary:
+  Upgrading: 0, Installing: 0, Removing: 1, Not Upgrading: 17
+  Freed space: 2553 kB
+
+(Reading database ... 98990 files and directories currently installed.)
+Removing openjdk-17-jdk:amd64 (17.0.19+10-1~26.04.2) ...
+The following packages were automatically installed and are no longer required:
+  gnome-accessibility-themes  gtk2-engines-pixbuf  libgail18t64    libgtk2.0-common         openjdk-17-jre-headless
+  gnome-themes-extra          ibus-gtk             libgtk2.0-0t64  openjdk-17-jdk-headless
+  gnome-themes-extra-data     libgail-common       libgtk2.0-bin   openjdk-17-jre
+Use 'sudo apt autoremove' to remove them.
+
+Installing:
+  openjdk-21-jdk
+
+Installing dependencies:
+  ibus-gtk3   libepoxy0      libgtk-3-bin     libwayland-cursor0  openjdk-21-jdk-headless  openjdk-21-jre-headless
+  libcolord2  libgtk-3-0t64  libgtk-3-common  libwayland-egl1     openjdk-21-jre
+
+Suggested packages:
+  colord  openjdk-21-demo    visualvm     fonts-ipafont-gothic  fonts-wqy-microhei  fonts-indic
+  gvfs    openjdk-21-source  libnss-mdns  fonts-ipafont-mincho  | fonts-wqy-zenhei
+
+Summary:
+  Upgrading: 0, Installing: 12, Removing: 0, Not Upgrading: 17
+  Download size: 139 MB
+  Space needed: 321 MB / 2961 MB available
+
+Get:1 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute/main amd64v3 ibus-gtk3 amd64 1.5.34~rc2-1 [19.9 kB]
+Get:2 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute/main amd64v3 libcolord2 amd64 1.4.8-3 [151 kB]
+Get:3 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute/main amd64v3 libepoxy0 amd64 1.5.10-2build1 [226 kB]
+Get:4 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute/main amd64v3 libwayland-cursor0 amd64 1.24.0-2 [10.8 kB]
+Get:5 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute/main amd64v3 libwayland-egl1 amd64 1.24.0-2 [6264 B]
+Get:6 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute/main amd64v3 libgtk-3-common all 3.24.52-0ubuntu1 [1424 kB]
+Get:7 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute/main amd64v3 libgtk-3-0t64 amd64 3.24.52-0ubuntu1 [3085 kB]
+Get:8 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute/main amd64v3 libgtk-3-bin amd64 3.24.52-0ubuntu1 [74.3 kB]
+Get:9 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-updates/universe amd64v3 openjdk-21-jre-headless amd64 21.0.11+10-1~26.04.2 [46.8 MB]
+Get:10 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-updates/universe amd64v3 openjdk-21-jre amd64 21.0.11+10-1~26.04.2 [227 kB]
+Get:11 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-updates/universe amd64v3 openjdk-21-jdk-headless amd64 21.0.11+10-1~26.04.2 [83.3 MB]
+Get:12 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-updates/universe amd64v3 openjdk-21-jdk amd64 21.0.11+10-1~26.04.2 [3543 kB]
+Fetched 139 MB in 2s (88.4 MB/s)          
+Selecting previously unselected package ibus-gtk3:amd64.
+(Reading database ... 98976 files and directories currently installed.)
+Preparing to unpack .../00-ibus-gtk3_1.5.34~rc2-1_amd64v3.deb ...
+Unpacking ibus-gtk3:amd64 (1.5.34~rc2-1) ...
+Selecting previously unselected package libcolord2:amd64.
+Preparing to unpack .../01-libcolord2_1.4.8-3_amd64v3.deb ...
+Unpacking libcolord2:amd64 (1.4.8-3) ...
+Selecting previously unselected package libepoxy0:amd64.
+Preparing to unpack .../02-libepoxy0_1.5.10-2build1_amd64v3.deb ...
+Unpacking libepoxy0:amd64 (1.5.10-2build1) ...
+Selecting previously unselected package libwayland-cursor0:amd64.
+Preparing to unpack .../03-libwayland-cursor0_1.24.0-2_amd64v3.deb ...
+Unpacking libwayland-cursor0:amd64 (1.24.0-2) ...
+Selecting previously unselected package libwayland-egl1:amd64.
+Preparing to unpack .../04-libwayland-egl1_1.24.0-2_amd64v3.deb ...
+Unpacking libwayland-egl1:amd64 (1.24.0-2) ...
+Selecting previously unselected package libgtk-3-common.
+Preparing to unpack .../05-libgtk-3-common_3.24.52-0ubuntu1_all.deb ...
+Unpacking libgtk-3-common (3.24.52-0ubuntu1) ...
+Selecting previously unselected package libgtk-3-0t64:amd64.
+Preparing to unpack .../06-libgtk-3-0t64_3.24.52-0ubuntu1_amd64v3.deb ...
+Unpacking libgtk-3-0t64:amd64 (3.24.52-0ubuntu1) ...
+Selecting previously unselected package libgtk-3-bin.
+Preparing to unpack .../07-libgtk-3-bin_3.24.52-0ubuntu1_amd64v3.deb ...
+Unpacking libgtk-3-bin (3.24.52-0ubuntu1) ...
+Selecting previously unselected package openjdk-21-jre-headless:amd64.
+Preparing to unpack .../08-openjdk-21-jre-headless_21.0.11+10-1~26.04.2_amd64v3.deb ...
+Unpacking openjdk-21-jre-headless:amd64 (21.0.11+10-1~26.04.2) ...
+Selecting previously unselected package openjdk-21-jre:amd64.
+Preparing to unpack .../09-openjdk-21-jre_21.0.11+10-1~26.04.2_amd64v3.deb ...
+Unpacking openjdk-21-jre:amd64 (21.0.11+10-1~26.04.2) ...
+Selecting previously unselected package openjdk-21-jdk-headless:amd64.
+Preparing to unpack .../10-openjdk-21-jdk-headless_21.0.11+10-1~26.04.2_amd64v3.deb ...
+Unpacking openjdk-21-jdk-headless:amd64 (21.0.11+10-1~26.04.2) ...
+Selecting previously unselected package openjdk-21-jdk:amd64.
+Preparing to unpack .../11-openjdk-21-jdk_21.0.11+10-1~26.04.2_amd64v3.deb ...
+Unpacking openjdk-21-jdk:amd64 (21.0.11+10-1~26.04.2) ...
+Setting up openjdk-21-jre-headless:amd64 (21.0.11+10-1~26.04.2) ...
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/java to provide /usr/bin/java (java) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jpackage to provide /usr/bin/jpackage (jpackage) in auto mod
+e
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/keytool to provide /usr/bin/keytool (keytool) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/rmiregistry to provide /usr/bin/rmiregistry (rmiregistry) in
+ auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/lib/jexec to provide /usr/bin/jexec (jexec) in auto mode
+Setting up libcolord2:amd64 (1.4.8-3) ...
+Setting up libepoxy0:amd64 (1.5.10-2build1) ...
+Setting up libwayland-cursor0:amd64 (1.24.0-2) ...
+Setting up libwayland-egl1:amd64 (1.24.0-2) ...
+Setting up ibus-gtk3:amd64 (1.5.34~rc2-1) ...
+Setting up libgtk-3-common (3.24.52-0ubuntu1) ...
+Processing triggers for libglib2.0-0t64:amd64 (2.88.0-1) ...
+Setting up libgtk-3-0t64:amd64 (3.24.52-0ubuntu1) ...
+Processing triggers for hicolor-icon-theme (0.18-2build1) ...
+Processing triggers for libc-bin (2.43-2ubuntu2) ...
+Setting up libgtk-3-bin (3.24.52-0ubuntu1) ...
+Processing triggers for man-db (2.13.1-1build1) ...
+Processing triggers for ca-certificates-java (20260311) ...
+done.
+Setting up openjdk-21-jre:amd64 (21.0.11+10-1~26.04.2) ...
+Setting up openjdk-21-jdk-headless:amd64 (21.0.11+10-1~26.04.2) ...
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jar to provide /usr/bin/jar (jar) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jarsigner to provide /usr/bin/jarsigner (jarsigner) in auto 
+mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/javac to provide /usr/bin/javac (javac) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/javadoc to provide /usr/bin/javadoc (javadoc) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/javap to provide /usr/bin/javap (javap) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jcmd to provide /usr/bin/jcmd (jcmd) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jdb to provide /usr/bin/jdb (jdb) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jdeprscan to provide /usr/bin/jdeprscan (jdeprscan) in auto 
+mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jdeps to provide /usr/bin/jdeps (jdeps) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jfr to provide /usr/bin/jfr (jfr) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jimage to provide /usr/bin/jimage (jimage) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jinfo to provide /usr/bin/jinfo (jinfo) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jlink to provide /usr/bin/jlink (jlink) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jmap to provide /usr/bin/jmap (jmap) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jmod to provide /usr/bin/jmod (jmod) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jps to provide /usr/bin/jps (jps) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jrunscript to provide /usr/bin/jrunscript (jrunscript) in au
+to mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jshell to provide /usr/bin/jshell (jshell) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jstack to provide /usr/bin/jstack (jstack) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jstat to provide /usr/bin/jstat (jstat) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jstatd to provide /usr/bin/jstatd (jstatd) in auto mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jwebserver to provide /usr/bin/jwebserver (jwebserver) in au
+to mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/serialver to provide /usr/bin/serialver (serialver) in auto 
+mode
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jhsdb to provide /usr/bin/jhsdb (jhsdb) in auto mode
+Setting up openjdk-21-jdk:amd64 (21.0.11+10-1~26.04.2) ...
+update-alternatives: using /usr/lib/jvm/java-21-openjdk-amd64/bin/jconsole to provide /usr/bin/jconsole (jconsole) in auto mod
+e
+Scanning processes...                                                                                                         
+Scanning linux images...                                                                                                      
+
+Running kernel seems to be up-to-date.
+
+No services need to be restarted.
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
+openjdk version "21.0.11" 2026-04-21
+OpenJDK Runtime Environment (build 21.0.11+10-1-26.04.2-Ubuntu)
+OpenJDK 64-Bit Server VM (build 21.0.11+10-1-26.04.2-Ubuntu, mixed mode, sharing)
+Hit:1 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute InRelease
+Hit:2 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-updates InRelease
+Hit:3 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-backports InRelease
+Ign:4 https://pkg.jenkins.io/debian-stable binary/ InRelease           
+Get:5 https://pkg.jenkins.io/debian-stable binary/ Release [2044 B]
+Hit:6 http://security.ubuntu.com/ubuntu resolute-security InRelease
+Get:7 https://pkg.jenkins.io/debian-stable binary/ Release.gpg [833 B]
+Ign:7 https://pkg.jenkins.io/debian-stable binary/ Release.gpg
+Warning: OpenPGP signature verification failed: https://pkg.jenkins.io/debian-stable binary/ Release: The following signatures couldn't be verified because the public key is not available: NO_PUBKEY 7198F4B714ABFC68
+Error: The repository 'https://pkg.jenkins.io/debian-stable binary/ Release' is not signed.
+Notice: Updating from such a repository can't be done securely, and is therefore disabled by default.
+Notice: See apt-secure(8) manpage for repository creation and user configuration details.
+Package jenkins is not available, but is referred to by another package.
+This may mean that the package is missing, has been obsoleted, or
+is only available from another source
+
+Error: Package 'jenkins' has no installation candidate
+Failed to enable unit: Unit jenkins.service does not exist
+Failed to start jenkins.service: Unit jenkins.service not found.
+openjdk version "21.0.11" 2026-04-21
+OpenJDK Runtime Environment (build 21.0.11+10-1-26.04.2-Ubuntu)
+OpenJDK 64-Bit Server VM (build 21.0.11+10-1-26.04.2-Ubuntu, mixed mode, sharing)
+jenkins: command not found
+inactive
+ubuntu@ip-172-31-47-234:~$ 
