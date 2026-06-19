@@ -1,122 +1,21 @@
-#!/bin/bash
+=================================
+AWS CLI CHECK
+==================================
+aws-cli/2.35.8 Python/3.14.5 Linux/7.0.0-1006-aws exe/x86_64.ubuntu.26
+==================================
+DOCKER CHECK
+==================================
+Docker version 29.1.3, build 29.1.3-0ubuntu4.1
+==================================
+KUBECTL CHECK
+==================================
+Client Version: v1.36.2
+Kustomize Version: v5.8.1
+==================================
+EKSCTL
+==================================
+curl: (2) no URL specified
+curl: try 'curl --help' or 'curl --manual' for more information
+Connection to 18.227.84.209 closed.
+labuser@ip-172-31-22-181:~$ 
 
-set -e
-
-echo "=================================="
-echo "AWS CLI CHECK"
-echo "=================================="
-
-aws --version || true
-
-echo "=================================="
-echo "DOCKER CHECK"
-echo "=================================="
-
-docker --version || true
-
-echo "=================================="
-echo "KUBECTL CHECK"
-echo "=================================="
-
-kubectl version --client || true
-
-echo "=================================="
-echo "EKSCTL"
-echo "=================================="
-
-cd /tmp
-
-curl --silent --location 
-"https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" 
--o eksctl.tar.gz
-
-tar -xzf eksctl.tar.gz
-
-sudo mv eksctl /usr/local/bin/
-
-echo "=================================="
-echo "JENKINS"
-echo "=================================="
-
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | 
-sudo tee /usr/share/keyrings/jenkins-keyring.asc >/dev/null
-
-echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | 
-sudo tee /etc/apt/sources.list.d/jenkins.list >/dev/null
-
-sudo apt update -y
-
-sudo apt install -y jenkins
-
-sudo systemctl enable jenkins
-sudo systemctl start jenkins
-
-echo "=================================="
-echo "DOCKER ACCESS"
-echo "=================================="
-
-sudo usermod -aG docker jenkins
-
-if id ubuntu >/dev/null 2>&1; then
-sudo usermod -aG docker ubuntu
-fi
-
-if id labuser >/dev/null 2>&1; then
-sudo usermod -aG docker labuser
-fi
-
-echo "=================================="
-echo "LAB REQUIREMENTS"
-echo "=================================="
-
-sudo docker volume create jenkins_data || true
-
-sudo docker network create jenkins_network || true
-
-sudo systemctl restart docker
-sudo systemctl restart jenkins
-
-echo "=================================="
-echo "VALIDATION"
-echo "=================================="
-
-echo ""
-echo "AWS CLI"
-aws --version
-
-echo ""
-echo "DOCKER"
-docker --version
-
-echo ""
-echo "KUBECTL"
-kubectl version --client
-
-echo ""
-echo "EKSCTL"
-eksctl version
-
-echo ""
-echo "MAVEN"
-mvn -version
-
-echo ""
-echo "JENKINS"
-systemctl is-active jenkins
-
-echo ""
-echo "DOCKER VOLUME"
-docker volume ls | grep jenkins_data
-
-echo ""
-echo "DOCKER NETWORK"
-docker network ls | grep jenkins_network
-
-echo ""
-echo "JENKINS PASSWORD"
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-
-echo ""
-echo "=================================="
-echo "INSTALLATION COMPLETE"
-echo "=================================="
