@@ -1,4 +1,4 @@
-docker build -t springboot-app .
+ubuntu@ip-172-31-39-80:~$ docker build -t springboot-app .
 
 aws ecr get-login-password --region us-east-2 | \
 docker login \
@@ -11,3 +11,19 @@ docker tag springboot-app:latest \
 
 docker push \
 761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+unable to prepare context: unable to evaluate symlinks in Dockerfile path: lstat /home/ubuntu/Dockerfile: no such file or directory
+
+WARNING! Your credentials are stored unencrypted in '/home/ubuntu/.docker/config.json'.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/go/credential-store/
+
+Login Succeeded
+Error response from daemon: No such image: springboot-app:latest
+The push refers to repository [761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo]
+tag does not exist: 761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
+ubuntu@ip-172-31-39-80:~$ 
+
