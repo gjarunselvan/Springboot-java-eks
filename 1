@@ -1,82 +1,79 @@
+#!/bin/bash
 
-ubuntu@ip-172-31-47-234:~$ #!/bin/bash
+REGION="us-east-2"
 
-echo "===== DOWNLOAD JENKINS ====="
+echo "=================================="
+echo "STEP 1 - DOCKER VOLUME"
+echo "=================================="
 
-cd /tmp
-
-curl -L -o jenkins.war \
-https://get.jenkins.io/war-stable/latest/jenkins.war
-
-echo ""
-echo "===== START JENKINS ====="
-
-nohup java -jar /tmp/jenkins.war \
---httpPort=8080 \
-> /tmp/jenkins.log 2>&1 &
+docker volume create jenkins_data || true
 
 echo ""
-echo "===== WAIT 60 SECONDS ====="
+echo "=================================="
+echo "STEP 2 - DOCKER NETWORK"
+echo "=================================="
 
-sleep 60
-
-echo ""
-echo "===== PROCESS CHECK ====="
-
-ps -ef | grep jenkins.war
+docker network create jenkins_network || true
 
 echo ""
-echo "===== PORT CHECK ====="
+echo "=================================="
+echo "STEP 3 - VERIFY DOCKER"
+echo "=================================="
 
-ss -tulpn | grep 8080
+docker volume ls | grep jenkins
 
-echo ""
-echo "===== JENKINS URL ====="
-
-curl -I http://localhost:8080
-
-echo ""
-echo "===== ADMIN PASSWORD ====="
-
-find ~/.jenkins -name initialAdminPassword -exec cat {} \; 2>/dev/null
+docker network ls | grep jenkins
 
 echo ""
-echo "===== DONE ====="
-===== DOWNLOAD JENKINS =====
-  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-                                 Dload  Upload  Total   Spent   Left   Speed
-  0      0   0      0   0      0      0      0                              0
-100 95.35M 100 95.35M   0      0 21.40M      0   00:04   00:04         12.35M
+echo "=================================="
+echo "STEP 4 - CREATE ECR"
+echo "=================================="
 
-===== START JENKINS =====
-[1] 9046
+aws ecr describe-repositories \
+--repository-names springboot-jenkins-ecr-repo \
+--region $REGION >/dev/null 2>&1
 
-===== WAIT 60 SECONDS =====
+if [ $? -eq 0 ]; then
+    echo "ECR already exists"
+else
+    aws ecr create-repository \
+    --repository-name springboot-jenkins-ecr-repo \
+    --region $REGION
+fi
 
-===== PROCESS CHECK =====
-ubuntu      9046    1742 37 13:15 pts/0    00:00:22 java -jar /tmp/jenkins.war --httpPort=8080
-ubuntu      9153    1742  0 13:16 pts/0    00:00:00 grep --color=auto jenkins.war
+echo ""
+echo "=================================="
+echo "STEP 5 - VERIFY ECR"
+echo "=================================="
 
-===== PORT CHECK =====
-tcp   LISTEN 0      50                      *:8080             *:*    users:(("java",pid=9046,fd=9))
+aws ecr describe-repositories \
+--repository-names springboot-jenkins-ecr-repo \
+--region $REGION \
+--query 'repositories[*].repositoryName' \
+--output text
 
-===== JENKINS URL =====
-HTTP/1.1 403 Forbidden
-Server: Jetty(12.1.8)
-Date: Fri, 19 Jun 2026 13:16:51 GMT
-X-Content-Type-Options: nosniff
-Content-Security-Policy-Report-Only: base-uri 'none'; default-src 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data:; script-src 'report-sample' 'self' usage.jenkins.io; style-src 'report-sample' 'self' 'unsafe-inline';
-Set-Cookie: JSESSIONID.b6ffc69c=node01sw6et9ju4ycumj75yamn7dxu0.node0; Path=/; HttpOnly; SameSite=Lax
-Expires: Thu, 01 Jan 1970 00:00:00 GMT
-Content-Type: text/html;charset=utf-8
-X-Hudson: 1.395
-X-Jenkins: 2.555.3
-X-Jenkins-Session: c0680bef
-Transfer-Encoding: chunked
+echo ""
+echo "=================================="
+echo "STEP 6 - CREATE EKS CLUSTER"
+echo "=================================="
 
+eksctl create cluster \
+--name jenkins-cluster \
+--region us-east-2 \
+--nodegroup-name jenkins-nodegroup \
+--node-type t3.medium \
+--nodes 2
 
-===== ADMIN PASSWORD =====
-d1bdbf7842eb48b58ec0309775684385
+echo ""
+echo "=================================="
+echo "STEP 7 - VERIFY"
+echo "=================================="
 
-===== DONE =====
-ubuntu@ip-172-31-47-234:/tmp$ 
+aws eks list-clusters --region us-east-2
+
+kubectl get nodes
+
+echo ""
+echo "=================================="
+echo "DONE"
+echo "=================================="
