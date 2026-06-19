@@ -1,113 +1,75 @@
-#!/bin/bash
+======================================
+NUVEPRO LAB VALIDATION
+======================================
 
-echo "======================================"
-echo "NUVEPRO LAB VALIDATION"
-echo "======================================"
+1. JAVA
+[PASS] Java Installed
 
-PASS=0
-TOTAL=0
+2. MAVEN
+[PASS] Maven Installed
 
-check() {
-TOTAL=$((TOTAL+1))
-if eval "$1" >/dev/null 2>&1; then
-echo "[PASS] $2"
-PASS=$((PASS+1))
-else
-echo "[FAIL] $2"
-fi
-}
+3. AWS CLI
+[PASS] AWS CLI Installed
 
-echo ""
-echo "1. JAVA"
-check "java -version" "Java Installed"
+4. DOCKER
+[PASS] Docker Installed
 
-echo ""
-echo "2. MAVEN"
-check "mvn -version" "Maven Installed"
+5. KUBECTL
+[PASS] kubectl Installed
 
-echo ""
-echo "3. AWS CLI"
-check "aws --version" "AWS CLI Installed"
+6. EKSCTL
+[PASS] eksctl Installed
 
-echo ""
-echo "4. DOCKER"
-check "docker --version" "Docker Installed"
+7. JENKINS SERVICE
+[FAIL] Jenkins Running
 
-echo ""
-echo "5. KUBECTL"
-check "kubectl version --client" "kubectl Installed"
+8. JENKINS VOLUME
+[FAIL] jenkins_data Exists
 
-echo ""
-echo "6. EKSCTL"
-check "eksctl version" "eksctl Installed"
+9. JENKINS NETWORK
+[FAIL] jenkins_network Exists
 
-echo ""
-echo "7. JENKINS SERVICE"
-check "systemctl is-active --quiet jenkins" "Jenkins Running"
+10. JENKINS USER
+[FAIL] jenkins User Exists
 
-echo ""
-echo "8. JENKINS VOLUME"
-check "docker volume inspect jenkins_data" "jenkins_data Exists"
+11. JENKINS IN DOCKER GROUP
+[FAIL] jenkins in docker group
 
-echo ""
-echo "9. JENKINS NETWORK"
-check "docker network inspect jenkins_network" "jenkins_network Exists"
+12. AWS IDENTITY
+[PASS] AWS Configured
 
-echo ""
-echo "10. JENKINS USER"
-check "id jenkins" "jenkins User Exists"
+13. ECR REPO
+[FAIL] ECR Exists
 
-echo ""
-echo "11. JENKINS IN DOCKER GROUP"
-check "groups jenkins | grep docker" "jenkins in docker group"
+14. EKS CLUSTER
+[FAIL] EKS Exists
 
-echo ""
-echo "12. AWS IDENTITY"
-check "aws sts get-caller-identity" "AWS Configured"
+15. NODEGROUP
+[FAIL] Nodegroup Exists
 
-echo ""
-echo "13. ECR REPO"
-check "aws ecr describe-repositories --repository-names springboot-jenkins-ecr-repo --region us-east-2" "ECR Exists"
+16. K8S NODES
+[FAIL] Kubernetes Nodes Ready
 
-echo ""
-echo "14. EKS CLUSTER"
-check "aws eks describe-cluster --name jenkins-cluster --region us-east-2" "EKS Exists"
+======================================
+SCORE
+======================================
+7 / 16
 
-echo ""
-echo "15. NODEGROUP"
-check "aws eks describe-nodegroup --cluster-name jenkins-cluster --nodegroup-name jenkins-nodegroup --region us-east-2" "Nodegroup Exists"
+======================================
+DETAILS
+======================================
+Docker Version:
+Docker version 29.1.3, build 29.1.3-0ubuntu4.1
 
-echo ""
-echo "16. K8S NODES"
-check "kubectl get nodes" "Kubernetes Nodes Ready"
+eksctl:
+0.227.0
 
-echo ""
-echo "======================================"
-echo "SCORE"
-echo "======================================"
+Jenkins:
+inactive
 
-echo "$PASS / $TOTAL"
+Volumes:
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
 
-echo ""
-echo "======================================"
-echo "DETAILS"
-echo "======================================"
-
-echo "Docker Version:"
-docker --version || true
-
-echo ""
-echo "eksctl:"
-eksctl version || true
-
-echo ""
-echo "Jenkins:"
-systemctl is-active jenkins || true
-
-echo ""
-echo "Volumes:"
-docker volume ls || true
-
-echo ""
-echo "Networks:"
-docker network ls || true
+Networks:
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+ubuntu@ip-172-31-34-211:/tmp$ 
