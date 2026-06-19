@@ -1,76 +1,49 @@
 #!/bin/bash
 
-REGION="us-east-2"
+echo "====================================="
+echo "PHASE 1 + PHASE 2 VALIDATION"
+echo "====================================="
 
+echo ""
+echo "===== JAVA ====="
+java -version | head -1
+
+echo ""
+echo "===== AWS CLI ====="
+aws --version
+
+echo ""
+echo "===== KUBECTL ====="
+kubectl version --client
+
+echo ""
+echo "===== EKSCTL ====="
+eksctl version
+
+echo ""
+echo "===== DOCKER ====="
+docker --version
+
+echo ""
 echo "===== JENKINS ====="
-if systemctl is-active --quiet jenkins; then
-    echo "PASS: Jenkins running"
-else
-    echo "FIX: Starting Jenkins"
-    sudo systemctl start jenkins
-fi
+systemctl is-active jenkins
 
 echo ""
-echo "===== DOCKER VOLUME ====="
-if docker volume ls | grep -q jenkins_data; then
-    echo "PASS: jenkins_data exists"
-else
-    echo "FIX: Creating jenkins_data"
-    docker volume create jenkins_data
-fi
+echo "===== IAM ROLE ====="
+aws iam get-role --role-name ec2-eks-role \
+--query 'Role.RoleName' \
+--output text
 
 echo ""
-echo "===== DOCKER NETWORK ====="
-if docker network ls | grep -q jenkins_network; then
-    echo "PASS: jenkins_network exists"
-else
-    echo "FIX: Creating jenkins_network"
-    docker network create jenkins_network
-fi
+echo "===== SECURITY GROUP ====="
+aws ec2 describe-security-groups \
+--filters Name=group-name,Values=jenkins-server-security-group \
+--query 'SecurityGroups[*].GroupName' \
+--output text
 
 echo ""
-echo "===== ECR ====="
-aws ecr describe-repositories \
---repository-names springboot-jenkins-ecr-repo \
---region $REGION >/dev/null 2>&1
-
-if [ $? -eq 0 ]; then
-    echo "PASS: ECR exists"
-else
-    echo "FIX: Creating ECR"
-    aws ecr create-repository \
-    --repository-name springboot-jenkins-ecr-repo \
-    --region $REGION
-fi
-
-echo ""
-echo "===== EKS CLUSTER ====="
-aws eks describe-cluster \
---name jenkins-cluster \
---region $REGION >/dev/null 2>&1
-
-if [ $? -eq 0 ]; then
-    echo "PASS: Cluster exists"
-else
-    echo "MISSING: Create cluster manually"
-    echo "eksctl create cluster --name jenkins-cluster --region $REGION --nodegroup-name jenkins-nodegroup --node-type t3.medium --nodes 2"
-fi
-
-echo ""
-echo "===== NODEGROUP ====="
-aws eks describe-nodegroup \
---cluster-name jenkins-cluster \
---nodegroup-name jenkins-nodegroup \
---region $REGION >/dev/null 2>&1
-
-if [ $? -eq 0 ]; then
-    echo "PASS: Nodegroup exists"
-else
-    echo "MISSING: Nodegroup not found"
-fi
-
-echo ""
-echo "===== FINAL STATUS ====="
-sudo systemctl is-active jenkins
-docker volume ls | grep jenkins
-docker network ls | grep jenkins
+echo "===== EC2 ====="
+aws ec2 describe-instances \
+--filters Name=instance-state-name,Values=running \
+--query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value|[0],InstanceType]' \
+--output table
