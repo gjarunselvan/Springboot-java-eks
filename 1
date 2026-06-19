@@ -1,68 +1,40 @@
-#!/bin/bash
+==================================
+MOVE JENKINS TO JENKINS USER
+==================================
 
-echo "=================================="
-echo "MOVE JENKINS TO JENKINS USER"
-echo "=================================="
+1. STOP JENKINS
+[1]+  Killed                     nohup java -jar /home/ubuntu/jenkins/jenkins.war --httpPort=8080 > /home/ubuntu/jenkins/jenkins.log 2>&1
 
-echo ""
-echo "1. STOP JENKINS"
-pkill -9 -f jenkins.war || true
+2. FIX OWNERSHIP
 
-sleep 5
+3. VERIFY JENKINS USER
+uid=1001(jenkins) gid=1001(jenkins) groups=1001(jenkins),109(docker)
 
-echo ""
-echo "2. FIX OWNERSHIP"
-sudo chown -R jenkins:jenkins /home/ubuntu/jenkins
+4. START AS JENKINS USER
+-bash: line 2: /home/ubuntu/jenkins/jenkins.log: Permission denied
 
-echo ""
-echo "3. VERIFY JENKINS USER"
-id jenkins
+WAIT 30 SECONDS...
 
-echo ""
-echo "4. START AS JENKINS USER"
+5. PROCESS CHECK
 
-sudo su - jenkins -c "
-nohup java -jar /home/ubuntu/jenkins/jenkins.war \
---httpPort=8080 \
-> /home/ubuntu/jenkins/jenkins.log 2>&1 &
-"
+6. PORT CHECK
 
-echo ""
-echo "WAIT 30 SECONDS..."
-sleep 30
+7. WEB CHECK
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0
+curl: (7) Failed to connect to localhost port 8080 after 1 ms: Could not connect to server
 
-echo ""
-echo "5. PROCESS CHECK"
-ps -ef | grep jenkins.war | grep -v grep
+8. DOCKER AS JENKINS
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
-echo ""
-echo "6. PORT CHECK"
-ss -tulpn | grep 8080
+==================================
+VALIDATION
+==================================
+PROCESS OWNER = 
+FAIL - Jenkins still not running as jenkins user
 
-echo ""
-echo "7. WEB CHECK"
-curl -I http://localhost:8080 | head -5
-
-echo ""
-echo "8. DOCKER AS JENKINS"
-sudo su - jenkins -c "docker ps"
-
-echo ""
-echo "=================================="
-echo "VALIDATION"
-echo "=================================="
-
-OWNER=$(ps -eo user,cmd | grep jenkins.war | grep -v grep | awk '{print $1}')
-
-echo "PROCESS OWNER = $OWNER"
-
-if [ "$OWNER" = "jenkins" ]; then
-    echo "PASS - Jenkins running as jenkins user"
-else
-    echo "FAIL - Jenkins still not running as jenkins user"
-fi
-
-echo ""
-echo "=================================="
-echo "DONE"
-echo "=================================="
+==================================
+DONE
+==================================
+ubuntu@ip-172-31-47-234:~$ 
