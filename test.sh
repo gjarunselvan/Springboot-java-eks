@@ -1,9 +1,30 @@
-Built-In Node
-Bring this node back online
-Update offline reason
-This is the Jenkins controller's built-in node. Builds running on this node will execute on the same system and as the same user as the Jenkins controller. This is appropriate e.g. for special jobs performing backups, but in general you should run builds on agents. Learn more about distributed builds.
-Jun 19, 2026, 10:30:59 AM
-Disconnected by jenkins-admin-user : Disk space is below threshold of 1.00 GiB. Only 948.11 MiB out of 952.61 MiB left on /tmp.
-Monitoring Data
-Projects tied to Built-In Node
-None
+#!/bin/bash
+
+echo "===== DISK USAGE ====="
+df -h
+
+echo ""
+echo "===== CLEAN APT CACHE ====="
+sudo apt clean
+
+echo ""
+echo "===== REMOVE PACKAGE CACHE ====="
+sudo rm -rf /var/cache/apt/archives/*
+
+echo ""
+echo "===== REMOVE TEMP FILES ====="
+sudo rm -rf /tmp/*
+
+echo ""
+echo "===== REMOVE DOWNLOADED FILES ====="
+rm -f ~/jenkins.deb
+rm -f ~/awscliv2.zip
+rm -f ~/eksctl_*.tar.gz
+
+echo ""
+echo "===== REMOVE UNUSED DOCKER DATA ====="
+docker system prune -af
+
+echo ""
+echo "===== DISK USAGE AFTER CLEANUP ====="
+df -h
