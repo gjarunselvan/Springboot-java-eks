@@ -1,131 +1,30 @@
-#!/bin/bash
+Setting up openjdk-25-jre:amd64 (25.0.3+9-2~26.04.2) ...
+Setting up default-jre-headless (2:1.25-77) ...
+Setting up default-jre (2:1.25-77) ...
+Setting up default-jdk-headless (2:1.25-77) ...
+Setting up openjdk-25-jdk:amd64 (25.0.3+9-2~26.04.2) ...
+update-alternatives: using /usr/lib/jvm/java-25-openjdk-amd64/bin/jconsole to provide /usr/bin/jconsole (jconsole) in auto mod
+e
+Setting up default-jdk (2:1.25-77) ...
+Processing triggers for libc-bin (2.43-2ubuntu2) ...
+Processing triggers for libgdk-pixbuf-2.0-0:amd64 (2.44.5+dfsg-4ubuntu1) ...
+Scanning processes...                                                                                                         
+Scanning linux images...                                                                                                      
 
-set -e
+Running kernel seems to be up-to-date.
 
-echo "=================================="
-echo "SYSTEM UPDATE"
-echo "=================================="
+No services need to be restarted.
 
-sudo apt update -y
+No containers need to be restarted.
 
-echo "=================================="
-echo "JAVA"
-echo "=================================="
+No user sessions are running outdated binaries.
 
-sudo apt install -y default-jdk
-
-echo "=================================="
-echo "TOOLS"
-echo "=================================="
-
-sudo apt install -y 
-curl 
-wget 
-git 
-unzip 
-jq 
-maven
-
-echo "=================================="
-echo "AWS CLI V2"
-echo "=================================="
-
-curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
-unzip -q awscliv2.zip
-sudo ./aws/install
-
-echo "=================================="
-echo "DOCKER"
-echo "=================================="
-
-sudo apt install -y docker.io
-
-sudo systemctl enable docker
-sudo systemctl start docker
-
-echo "=================================="
-echo "KUBECTL"
-echo "=================================="
-
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-
-chmod +x kubectl
-sudo mv kubectl /usr/local/bin/
-
-echo "=================================="
-echo "EKSCTL"
-echo "=================================="
-
-ARCH=amd64
-PLATFORM=$(uname -s)_$ARCH
-
-curl -sLO https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_${PLATFORM}.tar.gz
-
-tar -xzf eksctl_${PLATFORM}.tar.gz -C /tmp
-
-sudo mv /tmp/eksctl /usr/local/bin
-
-echo "=================================="
-echo "JENKINS"
-echo "=================================="
-
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | 
-sudo tee /usr/share/keyrings/jenkins-keyring.asc >/dev/null
-
-echo deb 
-[signed-by=/usr/share/keyrings/jenkins-keyring.asc] 
-https://pkg.jenkins.io/debian-stable binary/ | 
-sudo tee /etc/apt/sources.list.d/jenkins.list >/dev/null
-
-sudo apt update -y
-sudo apt install -y jenkins
-
-sudo systemctl enable jenkins
-sudo systemctl start jenkins
-
-echo "=================================="
-echo "JENKINS DOCKER ACCESS"
-echo "=================================="
-
-sudo usermod -aG docker jenkins
-sudo usermod -aG docker ubuntu
-
-echo "=================================="
-echo "LAB REQUIREMENTS"
-echo "=================================="
-
-sudo docker volume create jenkins_data || true
-sudo docker network create jenkins_network || true
-
-sudo systemctl restart docker
-sudo systemctl restart jenkins
-
-echo "=================================="
-echo "VALIDATION"
-echo "=================================="
-
-java -version
-aws --version
-docker --version
-kubectl version --client
-eksctl version
-mvn -version
-
-echo ""
-echo "Jenkins Service:"
-systemctl is-active jenkins
-
-echo ""
-echo "Docker Volume:"
-docker volume ls | grep jenkins_data
-
-echo ""
-echo "Docker Network:"
-docker network ls | grep jenkins_network
-
-echo ""
-echo "=================================="
-echo "JENKINS PASSWORD"
-echo "=================================="
-
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
+==================================
+TOOLS
+==================================
+Summary:                        
+  Upgrading: 0, Installing: 0, Removing: 0, Not Upgrading: 17
+curl: try 'curl --help' or 'curl --manual' for more information
+Connection to 18.227.84.209 closed.
+labuser@ip-172-31-22-181:~$ 
