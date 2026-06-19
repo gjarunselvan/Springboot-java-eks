@@ -1,22 +1,78 @@
-sudo chmod 755 /home/ubuntu
+4d9e91e6a6f: Pull complete
+dda865d877b5: Pull complete
+be9c5ac4e0e3: Pull complete
+7a65e501bf26: Pull complete
+Digest: sha256:8271b76c87e57a7d006a0ae7adf558f5ba71565a9daa17c34aed0f5632e61f7f
+Status: Downloaded newer image for lolhens/baseimage-openjre:latest
+ ---> 8271b76c87e5
+Step 2/4 : ADD target/springbootApp.jar springbootApp.jar
+ ---> 90a3c657b5d1
+Step 3/4 : EXPOSE 80
+ ---> Running in d33a7c2a839d
+ ---> Removed intermediate container d33a7c2a839d
+ ---> 7ea3593e3b66
+Step 4/4 : ENTRYPOINT ["java", "-jar", "springbootApp.jar"]
+ ---> Running in 4b8711a3defa
+ ---> Removed intermediate container 4b8711a3defa
+ ---> a8a8f1f08f18
+Successfully built a8a8f1f08f18
+Successfully tagged springboot-app:latest
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (ECR Login)
+[Pipeline] tool
+[Pipeline] envVarsForTool
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] sh
++ aws ecr get-login-password --region us-east-2
++ docker login --username AWS --password-stdin 761018881666.dkr.ecr.us-east-2.amazonaws.com
 
-sudo chown -R jenkins:jenkins /home/ubuntu/.jenkins
+WARNING! Your credentials are stored unencrypted in '/home/jenkins/.docker/config.json'.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/go/credential-store/
 
-sudo chmod -R 755 /home/ubuntu/.jenkins
-
-sudo su - jenkins -c "
-export JENKINS_HOME=/home/ubuntu/.jenkins
-nohup java \
--DJENKINS_HOME=/home/ubuntu/.jenkins \
--jar /home/jenkins/jenkins/jenkins.war \
---httpPort=8080 \
->/tmp/jenkins.log 2>&1 &
-"
-
-sleep 30
-
-ps -ef | grep jenkins.war | grep -v grep
-
-ss -tulpn | grep 8080
-
-tail -20 /tmp/jenkins.log
+Login Succeeded
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Docker Push)
+[Pipeline] tool
+[Pipeline] envVarsForTool
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] sh
++ docker tag springboot-app:latest 761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
++ docker push 761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
+The push refers to repository [761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo]
+4701e8dc9baf: Waiting
+04d9e91e6a6f: Waiting
+dda865d877b5: Waiting
+e3ddf1072b36: Waiting
+fe35b49728c2: Waiting
+9a0b0ce99936: Waiting
+d544b4e6d3ef: Waiting
+be9c5ac4e0e3: Waiting
+7a65e501bf26: Waiting
+3da94b830c08: Waiting
+unknown: unexpected status from HEAD request to https://761018881666.dkr.ecr.us-east-2.amazonaws.com/v2/springboot-jenkins-ecr-repo/blobs/sha256:7a65e501bf2620d28a4210ab114b0eb6b64cb7c8e0e4b10c7b1f59d10aab4f44: 403 Forbidden
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+Finished: FAILURE
