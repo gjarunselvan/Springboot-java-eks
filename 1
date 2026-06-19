@@ -1,41 +1,29 @@
-#!/bin/bash
+==================================
+JENKINS + DOCKER VALIDATION
+==================================
 
-echo "=================================="
-echo "JENKINS + DOCKER VALIDATION"
-echo "=================================="
+1. JENKINS USER
+uid=1001(jenkins) gid=1001(jenkins) groups=1001(jenkins),109(docker)
 
-echo ""
-echo "1. JENKINS USER"
-id jenkins
+2. JENKINS GROUPS
+jenkins : jenkins docker
 
-echo ""
-echo "2. JENKINS GROUPS"
-groups jenkins
+3. DOCKER SOCKET
+srw-rw---- 1 root docker 0 Jun 19 12:57 /var/run/docker.sock
 
-echo ""
-echo "3. DOCKER SOCKET"
-ls -l /var/run/docker.sock
+4. JENKINS CAN ACCESS DOCKER
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
-echo ""
-echo "4. JENKINS CAN ACCESS DOCKER"
-sudo su - jenkins -c "docker ps"
+PASS - Jenkins user can access Docker
 
-if [ $? -eq 0 ]; then
-    echo ""
-    echo "PASS - Jenkins user can access Docker"
-else
-    echo ""
-    echo "FAIL - Jenkins user cannot access Docker"
-fi
+5. WHOAMI AS JENKINS
+jenkins
 
-echo ""
-echo "5. WHOAMI AS JENKINS"
-sudo su - jenkins -c "whoami"
+==================================
+EXPECTED
+==================================
+whoami = jenkins
+docker ps = works
+jenkins in docker group
+ubuntu@ip-172-31-47-234:~$ 
 
-echo ""
-echo "=================================="
-echo "EXPECTED"
-echo "=================================="
-echo "whoami = jenkins"
-echo "docker ps = works"
-echo "jenkins in docker group"
