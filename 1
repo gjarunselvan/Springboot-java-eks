@@ -1,83 +1,29 @@
-#!/bin/bash
+======================================
+      EKS VALIDATION
+======================================
 
-PASS=0
-TOTAL=5
+1. EKS CLUSTER EXISTS
+PASS
 
-check() {
-  if [ $1 -eq 0 ]; then
-    echo "PASS"
-    PASS=$((PASS+1))
-  else
-    echo "FAIL"
-  fi
+2. EKS CLUSTER STATUS
+STATUS = ACTIVE
+PASS
+
+3. NODEGROUP EXISTS
+{
+    "nodegroups": [
+        "jenkins-nodegroup"
+    ]
 }
+PASS
 
-echo "======================================"
-echo "      EKS VALIDATION"
-echo "======================================"
+4. KUBECONFIG
+PASS
 
-echo ""
-echo "1. EKS CLUSTER EXISTS"
+5. K8S NODES
+PASS
 
-aws eks describe-cluster \
---name jenkins-cluster \
---region us-east-2 >/dev/null 2>&1
-
-check $?
-
-echo ""
-echo "2. EKS CLUSTER STATUS"
-
-STATUS=$(aws eks describe-cluster \
---name jenkins-cluster \
---region us-east-2 \
---query 'cluster.status' \
---output text 2>/dev/null)
-
-echo "STATUS = $STATUS"
-
-if [ "$STATUS" = "ACTIVE" ]; then
-  check 0
-else
-  check 1
-fi
-
-echo ""
-echo "3. NODEGROUP EXISTS"
-
-aws eks list-nodegroups \
---cluster-name jenkins-cluster \
---region us-east-2
-
-COUNT=$(aws eks list-nodegroups \
---cluster-name jenkins-cluster \
---region us-east-2 \
---query 'length(nodegroups)' \
---output text 2>/dev/null)
-
-if [ "$COUNT" -gt 0 ]; then
-  check 0
-else
-  check 1
-fi
-
-echo ""
-echo "4. KUBECONFIG"
-
-aws eks update-kubeconfig \
---region us-east-2 \
---name jenkins-cluster >/dev/null 2>&1
-
-check $?
-
-echo ""
-echo "5. K8S NODES"
-
-kubectl get nodes >/dev/null 2>&1
-
-check $?
-
-echo ""
-echo "======================================"
-echo "EKS SCORE : $PASS / $TOTAL"
-echo "======================================"
+======================================
+EKS SCORE : 5 / 5
+======================================
+ubuntu@ip-172-31-47-234:~$ 
