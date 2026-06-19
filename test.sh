@@ -1,80 +1,66 @@
-#!/bin/bash
+./set.sh 
+======================================
+FIX JENKINS REPOSITORY
+======================================
+deb [signed-by=/usr/share/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/
+======================================
+UPDATE PACKAGES
+======================================
+Hit:1 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute InRelease
+Hit:2 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-updates InRelease                       
+Hit:3 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-backports InRelease                     
+Ign:4 https://pkg.jenkins.io/debian-stable binary/ InRelease                                          
+Get:5 https://pkg.jenkins.io/debian-stable binary/ Release [2044 B]   
+Get:6 https://pkg.jenkins.io/debian-stable binary/ Release.gpg [833 B]
+Hit:7 http://security.ubuntu.com/ubuntu resolute-security InRelease
+Ign:6 https://pkg.jenkins.io/debian-stable binary/ Release.gpg
+Warning: OpenPGP signature verification failed: https://pkg.jenkins.io/debian-stable binary/ Release: The following signatures couldn't be verified because the public key is not available: NO_PUBKEY 7198F4B714ABFC68
+Error: The repository 'https://pkg.jenkins.io/debian-stable binary/ Release' is not signed.
+Notice: Updating from such a repository can't be done securely, and is therefore disabled by default.
+Notice: See apt-secure(8) manpage for repository creation and user configuration details.
+======================================
+INSTALL JENKINS
+======================================
+Package jenkins is not available, but is referred to by another package.
+This may mean that the package is missing, has been obsoleted, or
+is only available from another source
 
-echo "======================================"
-echo "FIX JENKINS REPOSITORY"
-echo "======================================"
+Error: Package 'jenkins' has no installation candidate
+Failed to enable unit: Unit jenkins.service does not exist
+Failed to start jenkins.service: Unit jenkins.service not found.
+======================================
+FIX DOCKER PERMISSIONS
+======================================
+======================================
+CREATE DOCKER VOLUME
+======================================
+jenkins_data
+======================================
+CREATE DOCKER NETWORK
+======================================
+Error response from daemon: network with name jenkins_network already exists
+======================================
+VERIFY SERVICES
+======================================
 
-sudo rm -f /etc/apt/sources.list.d/jenkins.list
+JENKINS STATUS
+inactive
 
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | \
-sudo gpg --dearmor -o /usr/share/keyrings/jenkins-keyring.gpg
+DOCKER STATUS
+active
 
-echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/" | \
-sudo tee /etc/apt/sources.list.d/jenkins.list
+DOCKER VOLUMES
+DRIVER    VOLUME NAME
+local     jenkins_data
 
-echo "======================================"
-echo "UPDATE PACKAGES"
-echo "======================================"
+DOCKER NETWORKS
+0f04cffead58   jenkins_network   bridge    local
 
-sudo apt update
+JENKINS PASSWORD
+cat: /var/lib/jenkins/secrets/initialAdminPassword: No such file or directory
 
-echo "======================================"
-echo "INSTALL JENKINS"
-echo "======================================"
-
-sudo apt install jenkins -y
-
-sudo systemctl enable jenkins
-sudo systemctl start jenkins
-
-echo "======================================"
-echo "FIX DOCKER PERMISSIONS"
-echo "======================================"
-
-sudo usermod -aG docker ubuntu
-
-sudo chmod 666 /var/run/docker.sock
-
-echo "======================================"
-echo "CREATE DOCKER VOLUME"
-echo "======================================"
-
-docker volume create jenkins_data
-
-echo "======================================"
-echo "CREATE DOCKER NETWORK"
-echo "======================================"
-
-docker network create jenkins_network
-
-echo "======================================"
-echo "VERIFY SERVICES"
-echo "======================================"
-
-echo ""
-echo "JENKINS STATUS"
-sudo systemctl is-active jenkins
-
-echo ""
-echo "DOCKER STATUS"
-sudo systemctl is-active docker
-
-echo ""
-echo "DOCKER VOLUMES"
-docker volume ls
-
-echo ""
-echo "DOCKER NETWORKS"
-docker network ls | grep jenkins
-
-echo ""
-echo "JENKINS PASSWORD"
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-
-echo ""
-echo "PUBLIC IP"
-curl -s ifconfig.me
-
-echo ""
-echo "OPEN JENKINS"
-echo "http://$(curl -s ifconfig.me):8080"
+PUBLIC IP
+3.137.153.32
+OPEN JENKINS
+http://3.137.153.32:8080
+ubuntu@ip-172-31-39-80:~$ 
