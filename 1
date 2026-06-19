@@ -1,62 +1,39 @@
 #!/bin/bash
 
-echo "=================================="
-echo "IAM ROLE CHECK"
-echo "=================================="
-aws iam get-role --role-name ec2-eks-role --query 'Role.RoleName' --output text
+sudo apt update -y
+
+echo "===== JAVA ====="
+sudo apt install openjdk-17-jdk -y
+java -version
 
 echo ""
-echo "=================================="
-echo "SECURITY GROUP CHECK"
-echo "=================================="
-aws ec2 describe-security-groups \
---filters "Name=group-name,Values=jenkins-server-security-group" \
---query 'SecurityGroups[*].[GroupName,GroupId,VpcId]' \
---output table
+echo "===== AWS CLI ====="
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo apt install unzip -y
+unzip -o awscliv2.zip
+sudo ./aws/install
+aws --version
 
 echo ""
-echo "=================================="
-echo "EC2 CHECK"
-echo "=================================="
-aws ec2 describe-instances \
---filters "Name=tag:Name,Values=jenkins-server" \
-"Name=instance-state-name,Values=running,pending" \
---query 'Reservations[*].Instances[*].[InstanceId,InstanceType,State.Name,PrivateIpAddress]' \
---output table
+echo "===== KUBECTL ====="
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+kubectl version --client
 
 echo ""
-echo "=================================="
-echo "SUMMARY"
-echo "=================================="
-echo "Expected:"
-echo "Role = ec2-eks-role"
-echo "Security Group = jenkins-server-security-group"
-echo "EC2 Name = jenkins-server"
-echo "EC2 Type = t3.small"
-==================================
-IAM ROLE CHECK
-==================================
-Command 'aws' not found, but can be installed with:
-sudo apt install awscli
+echo "===== EKSCTL ====="
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" | tar xz
+sudo mv eksctl /usr/local/bin
+eksctl version
 
-==================================
-SECURITY GROUP CHECK
-==================================
-Command 'aws' not found, but can be installed with:
-sudo apt install awscli
+echo ""
+echo "===== DOCKER ====="
+sudo apt install docker.io -y
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker ubuntu
+docker --version
 
-==================================
-EC2 CHECK
-==================================
-Command 'aws' not found, but can be installed with:
-sudo apt install awscli
-
-==================================
-SUMMARY
-==================================
-Expected:
-Role = ec2-eks-role
-Security Group = jenkins-server-security-group
-EC2 Name = jenkins-server
-EC2 Type = t3.small
-ubuntu@ip-172-31-41-72:~$ 
+echo ""
+echo "===== DONE ====="
