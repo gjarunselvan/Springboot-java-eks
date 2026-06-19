@@ -1,124 +1,116 @@
-#!/bin/bash
+======================================
+NUVEPRO FINAL LAB VALIDATION
+======================================
 
-echo "======================================"
-echo "NUVEPRO FINAL LAB VALIDATION"
-echo "======================================"
+1. EC2 INSTANCE
+INSTANCE TYPE = 
+FAIL
 
-echo ""
-echo "1. EC2 INSTANCE"
+2. IAM ROLE
+ROLE = 
+FAIL
 
-INSTANCE_TYPE=$(curl -s http://169.254.169.254/latest/meta-data/instance-type)
+3. JAVA
+PASS
 
-echo "INSTANCE TYPE = $INSTANCE_TYPE"
+4. AWS CLI
+PASS
 
-if [ "$INSTANCE_TYPE" = "t3.small" ]; then
-echo "PASS"
-else
-echo "FAIL"
-fi
+5. DOCKER
+PASS
 
-echo ""
-echo "2. IAM ROLE"
+6. KUBECTL
+PASS
 
-ROLE=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/)
+7. EKSCTL
+PASS
 
-echo "ROLE = $ROLE"
+8. JENKINS
+FAIL
 
-if [ "$ROLE" = "ec2-eks-role" ]; then
-echo "PASS"
-else
-echo "FAIL"
-fi
+9. JENKINS USER
+FAIL
 
-echo ""
-echo "3. JAVA"
-java -version >/dev/null 2>&1 && echo PASS || echo FAIL
+10. DOCKER GROUP
+groups: 'jenkins': no such user
+FAIL
 
-echo ""
-echo "4. AWS CLI"
-aws --version >/dev/null 2>&1 && echo PASS || echo FAIL
+11. DOCKER VOLUME
+FAIL
 
-echo ""
-echo "5. DOCKER"
-docker --version >/dev/null 2>&1 && echo PASS || echo FAIL
+12. DOCKER NETWORK
+FAIL
 
-echo ""
-echo "6. KUBECTL"
-kubectl version --client >/dev/null 2>&1 && echo PASS || echo FAIL
+13. ECR REPOSITORY
+{
+    "repositories": []
+}
+--repository-names: command not found
+FAIL
 
-echo ""
-echo "7. EKSCTL"
-eksctl version >/dev/null 2>&1 && echo PASS || echo FAIL
+14. EKS CLUSTER
 
-echo ""
-echo "8. JENKINS"
-systemctl is-active jenkins >/dev/null 2>&1 && echo PASS || echo FAIL
+aws: [ERROR]: An error occurred (ParamValidation): the following arguments are required: --name
 
-echo ""
-echo "9. JENKINS USER"
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
 
-id jenkins >/dev/null 2>&1 && echo PASS || echo FAIL
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
 
-echo ""
-echo "10. DOCKER GROUP"
+--name: command not found
+FAIL
 
-groups jenkins | grep docker >/dev/null 2>&1 && echo PASS || echo FAIL
+15. NODEGROUP
 
-echo ""
-echo "11. DOCKER VOLUME"
+aws: [ERROR]: An error occurred (ParamValidation): the following arguments are required: --cluster-name, --nodegroup-name
 
-sudo docker volume inspect jenkins_data >/dev/null 2>&1 && echo PASS || echo FAIL
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
 
-echo ""
-echo "12. DOCKER NETWORK"
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
 
-sudo docker network inspect jenkins_network >/dev/null 2>&1 && echo PASS || echo FAIL
+--cluster-name: command not found
+--nodegroup-name: command not found
+FAIL
 
-echo ""
-echo "13. ECR REPOSITORY"
+16. K8S NODES
+FAIL
 
-aws ecr describe-repositories 
---repository-names springboot-jenkins-ecr-repo 
---region us-east-2 >/dev/null 2>&1 && echo PASS || echo FAIL
+17. ECR IMAGE
 
-echo ""
-echo "14. EKS CLUSTER"
+aws: [ERROR]: An error occurred (ParamValidation): the following arguments are required: --repository-name
 
-aws eks describe-cluster 
---name jenkins-cluster 
---region us-east-2 >/dev/null 2>&1 && echo PASS || echo FAIL
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
 
-echo ""
-echo "15. NODEGROUP"
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
 
-aws eks describe-nodegroup 
---cluster-name jenkins-cluster 
---nodegroup-name jenkins-nodegroup 
---region us-east-2 >/dev/null 2>&1 && echo PASS || echo FAIL
+--repository-name: command not found
+--region: command not found
 
-echo ""
-echo "16. K8S NODES"
+18. SPRINGBOOT DEPLOYMENT
+E0619 16:08:25.990580    7177 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0619 16:08:25.991031    7177 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0619 16:08:25.992392    7177 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0619 16:08:25.992672    7177 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0619 16:08:25.994054    7177 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
 
-kubectl get nodes >/dev/null 2>&1 && echo PASS || echo FAIL
+19. LOADBALANCER SERVICE
+E0619 16:08:26.056994    7197 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0619 16:08:26.057329    7197 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0619 16:08:26.058788    7197 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0619 16:08:26.059050    7197 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0619 16:08:26.060457    7197 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
 
-echo ""
-echo "17. ECR IMAGE"
-
-aws ecr list-images 
---repository-name springboot-jenkins-ecr-repo 
---region us-east-2
-
-echo ""
-echo "18. SPRINGBOOT DEPLOYMENT"
-
-kubectl get deployment springboot-app-sample
-
-echo ""
-echo "19. LOADBALANCER SERVICE"
-
-kubectl get svc springboot-app
-
-echo ""
-echo "======================================"
-echo "DONE"
-echo "======================================"
+======================================
+DONE
+======================================
+ubuntu@ip-172-31-34-211:/tmp$ 
