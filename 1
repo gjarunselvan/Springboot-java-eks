@@ -1,50 +1,36 @@
-#!/bin/bash
+==================================
+JENKINS USER CHECK
+==================================
+ubuntu     13986    1742 15 13:50 pts/0    00:01:45 java -jar /home/ubuntu/jenkins/jenkins.war --httpPort=8080
 
-echo "=================================="
-echo "JENKINS USER CHECK"
-echo "=================================="
+==================================
+JENKINS ACCOUNT
+==================================
+id: 'jenkins': no such user
 
-ps -ef | grep jenkins | grep -v grep
+==================================
+ADD JENKINS TO DOCKER GROUP
+==================================
+usermod: user 'jenkins' does not exist
 
-echo ""
-echo "=================================="
-echo "JENKINS ACCOUNT"
-echo "=================================="
+==================================
+VERIFY GROUPS
+==================================
+groups: 'jenkins': no such user
 
-id jenkins
+==================================
+TEST DOCKER AS JENKINS
+==================================
+su: user jenkins does not exist or the user entry does not contain all the required fields
 
-echo ""
-echo "=================================="
-echo "ADD JENKINS TO DOCKER GROUP"
-echo "=================================="
+==================================
+DOCKER SOCKET
+==================================
+srw-rw---- 1 root docker 0 Jun 19 12:57 /var/run/docker.sock
 
-sudo usermod -aG docker jenkins
-
-echo ""
-echo "=================================="
-echo "VERIFY GROUPS"
-echo "=================================="
-
-groups jenkins
-
-echo ""
-echo "=================================="
-echo "TEST DOCKER AS JENKINS"
-echo "=================================="
-
-sudo su - jenkins -c "docker ps"
-
-echo ""
-echo "=================================="
-echo "DOCKER SOCKET"
-echo "=================================="
-
-ls -l /var/run/docker.sock
-
-echo ""
-echo "=================================="
-echo "RESULT"
-echo "=================================="
-
-echo "If docker ps works above,"
-echo "go to Jenkins -> Build Now"
+==================================
+RESULT
+==================================
+If docker ps works above,
+go to Jenkins -> Build Now
+ubuntu@ip-172-31-47-234:~$ 
