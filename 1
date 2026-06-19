@@ -1,79 +1,126 @@
-#!/bin/bash
-
-REGION="us-east-2"
-
-echo "=================================="
-echo "STEP 1 - DOCKER VOLUME"
-echo "=================================="
-
-docker volume create jenkins_data || true
-
-echo ""
-echo "=================================="
-echo "STEP 2 - DOCKER NETWORK"
-echo "=================================="
-
-docker network create jenkins_network || true
-
-echo ""
-echo "=================================="
-echo "STEP 3 - VERIFY DOCKER"
-echo "=================================="
-
-docker volume ls | grep jenkins
-
-docker network ls | grep jenkins
-
-echo ""
-echo "=================================="
-echo "STEP 4 - CREATE ECR"
-echo "=================================="
-
-aws ecr describe-repositories \
---repository-names springboot-jenkins-ecr-repo \
---region $REGION >/dev/null 2>&1
-
-if [ $? -eq 0 ]; then
-    echo "ECR already exists"
-else
-    aws ecr create-repository \
-    --repository-name springboot-jenkins-ecr-repo \
-    --region $REGION
-fi
-
-echo ""
-echo "=================================="
-echo "STEP 5 - VERIFY ECR"
-echo "=================================="
-
-aws ecr describe-repositories \
---repository-names springboot-jenkins-ecr-repo \
---region $REGION \
---query 'repositories[*].repositoryName' \
---output text
-
-echo ""
-echo "=================================="
-echo "STEP 6 - CREATE EKS CLUSTER"
-echo "=================================="
-
-eksctl create cluster \
---name jenkins-cluster \
---region us-east-2 \
---nodegroup-name jenkins-nodegroup \
---node-type t3.medium \
---nodes 2
-
-echo ""
-echo "=================================="
-echo "STEP 7 - VERIFY"
-echo "=================================="
-
-aws eks list-clusters --region us-east-2
-
 kubectl get nodes
 
 echo ""
 echo "=================================="
 echo "DONE"
 echo "=================================="
+==================================
+STEP 1 - DOCKER VOLUME
+==================================
+jenkins_data
+
+==================================
+STEP 2 - DOCKER NETWORK
+==================================
+68e1bb0e54cb6cc233db1d3fcf9e6a500929f508ddee1d649c2b3faf6d17ddff
+
+==================================
+STEP 3 - VERIFY DOCKER
+==================================
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+
+==================================
+STEP 4 - CREATE ECR
+==================================
+ECR already exists
+
+==================================
+STEP 5 - VERIFY ECR
+==================================
+springboot-jenkins-ecr-repo
+
+==================================
+STEP 6 - CREATE EKS CLUSTER
+==================================
+2026-06-19 13:20:24 [ℹ]  eksctl version 0.227.0
+2026-06-19 13:20:24 [ℹ]  using region us-east-2
+2026-06-19 13:20:24 [ℹ]  setting availability zones to [us-east-2c us-east-2b us-east-2a]
+2026-06-19 13:20:24 [ℹ]  subnets for us-east-2c - public:192.168.0.0/19 private:192.168.96.0/19
+2026-06-19 13:20:24 [ℹ]  subnets for us-east-2b - public:192.168.32.0/19 private:192.168.128.0/19
+2026-06-19 13:20:24 [ℹ]  subnets for us-east-2a - public:192.168.64.0/19 private:192.168.160.0/19
+2026-06-19 13:20:24 [ℹ]  nodegroup "jenkins-nodegroup" will use "" [AmazonLinux2023/1.34]
+2026-06-19 13:20:24 [!]  Auto Mode will be enabled by default in an upcoming release of eksctl. This means managed node groups and managed networking add-ons will no longer be created by default. To maintain current behavior, explicitly set 'autoModeConfig.enabled: false' in your cluster configuration. Learn more: https://eksctl.io/usage/auto-mode/
+2026-06-19 13:20:24 [ℹ]  using Kubernetes version 1.34
+2026-06-19 13:20:24 [ℹ]  creating EKS cluster "jenkins-cluster" in "us-east-2" region with managed nodes
+2026-06-19 13:20:24 [ℹ]  will create 2 separate CloudFormation stacks for cluster itself and the initial managed nodegroup
+2026-06-19 13:20:24 [ℹ]  if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=us-east-2 --cluster=jenkins-cluster'
+2026-06-19 13:20:24 [ℹ]  Kubernetes API endpoint access will use default of {publicAccess=true, privateAccess=false} for cluster "jenkins-cluster" in "us-east-2"
+2026-06-19 13:20:24 [ℹ]  CloudWatch logging will not be enabled for cluster "jenkins-cluster" in "us-east-2"
+2026-06-19 13:20:24 [ℹ]  you can enable it with 'eksctl utils update-cluster-logging --enable-types={SPECIFY-YOUR-LOG-TYPES-HERE (e.g. all)} --region=us-east-2 --cluster=jenkins-cluster'
+2026-06-19 13:20:24 [ℹ]  default addons vpc-cni, kube-proxy, coredns, metrics-server were not specified, will install them as EKS addons
+2026-06-19 13:20:24 [ℹ]  
+2 sequential tasks: { create cluster control plane "jenkins-cluster", 
+    2 sequential sub-tasks: { 
+        2 sequential sub-tasks: { 
+            1 task: { create addons },
+            wait for control plane to become ready,
+        },
+        create managed nodegroup "jenkins-nodegroup",
+    } 
+}
+2026-06-19 13:20:24 [ℹ]  building cluster stack "eksctl-jenkins-cluster-cluster"
+2026-06-19 13:20:24 [!]  1 error(s) occurred and cluster hasn't been created properly, you may wish to check CloudFormation console
+2026-06-19 13:20:24 [ℹ]  to cleanup resources, run 'eksctl delete cluster --region=us-east-2 --name=jenkins-cluster'
+2026-06-19 13:20:24 [✖]  creating CloudFormation stack "eksctl-jenkins-cluster-cluster": operation error CloudFormation: CreateStack, https response error StatusCode: 400, RequestID: 565a9a43-1a46-4b00-9a99-911301d69a5e, AlreadyExistsException: Stack [eksctl-jenkins-cluster-cluster] already exists
+Error: failed to create cluster "jenkins-cluster"
+
+==================================
+STEP 7 - VERIFY
+==================================
+{
+    "clusters": [
+        "jenkins-cluster"
+    ]
+}
+E0619 13:20:25.496812   10223 memcache.go:265] "Unhandled Error" err=<
+	couldn't get current server API group list: <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+	Authentication required
+	<!--
+	-->
+	
+	</body></html>
+ >
+E0619 13:20:25.503318   10223 memcache.go:265] "Unhandled Error" err=<
+	couldn't get current server API group list: <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+	Authentication required
+	<!--
+	-->
+	
+	</body></html>
+ >
+E0619 13:20:25.507074   10223 memcache.go:265] "Unhandled Error" err=<
+	couldn't get current server API group list: <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+	Authentication required
+	<!--
+	-->
+	
+	</body></html>
+ >
+E0619 13:20:25.510184   10223 memcache.go:265] "Unhandled Error" err=<
+	couldn't get current server API group list: <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+	Authentication required
+	<!--
+	-->
+	
+	</body></html>
+ >
+E0619 13:20:25.515092   10223 memcache.go:265] "Unhandled Error" err=<
+	couldn't get current server API group list: <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+	Authentication required
+	<!--
+	-->
+	
+	</body></html>
+ >
+Error from server (Forbidden): <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+Authentication required
+<!--
+-->
+
+</body></html>
+
+==================================
+DONE
+==================================
+ubuntu@ip-172-31-47-234:~$ 
