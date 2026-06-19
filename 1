@@ -1,189 +1,98 @@
-ubuntu@ip-172-31-39-80:~$ #!/bin/bash
+#!/bin/bash
 
 echo "======================================"
-echo "AWS IDENTITY"
+echo "STEP 1 - BUILD DOCKER IMAGE"
 echo "======================================"
 
-aws sts get-caller-identity
-
-echo ""
-echo "======================================"
-echo "ECR REPOSITORY"
-echo "======================================"
-
-aws ecr describe-repositories \
---repository-names springboot-jenkins-ecr-repo \
---region us-east-2
+docker build -t springboot-app .
 
 echo ""
 echo "======================================"
-echo "CREATING EKS CLUSTER"
+echo "STEP 2 - LOGIN TO ECR"
 echo "======================================"
 
-eksctl create cluster \
---name jenkins-cluster \
---region us-east-2 \
---nodegroup-name jenkins-nodegroup \
---node-type t3.medium \
---nodes 2 \
---nodes-min 2 \
---nodes-max 2 \
---managed
+aws ecr get-login-password --region us-east-2 | \
+docker login \
+--username AWS \
+--password-stdin \
+761018881666.dkr.ecr.us-east-2.amazonaws.com
 
 echo ""
 echo "======================================"
-echo "VERIFY CLUSTER"
+echo "STEP 3 - TAG IMAGE"
 echo "======================================"
 
-eksctl get cluster --region us-east-2
-
-echo ""
-echo "======================================"
-echo "VERIFY NODES"
-echo "======================================"
-
-kubectl get nodes -o wide
+docker tag springboot-app:latest \
+761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
 
 echo ""
 echo "======================================"
-echo "VERIFY PODS"
+echo "STEP 4 - PUSH IMAGE"
 echo "======================================"
 
-kubectl get pods -A
+docker push \
+761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
+
+echo ""
+echo "======================================"
+echo "STEP 5 - CREATE K8S DEPLOYMENT"
+echo "======================================"
+
+cat > eks-deploy-k8s.yaml <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springboot-app
+  template:
+    metadata:
+      labels:
+        app: springboot-app
+    spec:
+      containers:
+      - name: springboot-app
+        image: 761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-service
+spec:
+  selector:
+    app: springboot-app
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+EOF
+
+echo ""
+echo "======================================"
+echo "STEP 6 - DEPLOY TO EKS"
+echo "======================================"
+
+kubectl apply -f eks-deploy-k8s.yaml
+
+echo ""
+echo "======================================"
+echo "STEP 7 - VERIFY"
+echo "======================================"
+
+kubectl get nodes
+
+echo ""
+kubectl get pods
+
+echo ""
+kubectl get svc
 
 echo ""
 echo "======================================"
 echo "DONE"
 echo "======================================"
-======================================
-AWS IDENTITY
-======================================
-{
-    "UserId": "AROA3CMCCS2BGEO6FYFZR:i-0df79c0eb08126349",
-    "Account": "761018881666",
-    "Arn": "arn:aws:sts::761018881666:assumed-role/ec2-eks-role/i-0df79c0eb08126349"
-}
-
-======================================
-ECR REPOSITORY
-======================================
-{
-    "repositories": [
-        {
-            "repositoryArn": "arn:aws:ecr:us-east-2:761018881666:repository/springboot-jenkins-ecr-repo",
-            "registryId": "761018881666",
-            "repositoryName": "springboot-jenkins-ecr-repo",
-            "repositoryUri": "761018881666.dkr.ecr.us-east-2.amazonaws.com/springboot-jenkins-ecr-repo",
-            "createdAt": "2026-01-31T11:46:54.264000+00:00",
-            "imageTagMutability": "MUTABLE",
-            "imageScanningConfiguration": {
-                "scanOnPush": false
-            },
-            "encryptionConfiguration": {
-                "encryptionType": "AES256"
-            }
-        }
-    ]
-}
-
-======================================
-CREATING EKS CLUSTER
-======================================
-2026-06-19 11:00:06 [ℹ]  eksctl version 0.227.0
-2026-06-19 11:00:06 [ℹ]  using region us-east-2
-2026-06-19 11:00:06 [ℹ]  setting availability zones to [us-east-2b us-east-2c us-east-2a]
-2026-06-19 11:00:06 [ℹ]  subnets for us-east-2b - public:192.168.0.0/19 private:192.168.96.0/19
-2026-06-19 11:00:06 [ℹ]  subnets for us-east-2c - public:192.168.32.0/19 private:192.168.128.0/19
-2026-06-19 11:00:06 [ℹ]  subnets for us-east-2a - public:192.168.64.0/19 private:192.168.160.0/19
-2026-06-19 11:00:06 [ℹ]  nodegroup "jenkins-nodegroup" will use "" [AmazonLinux2023/1.34]
-2026-06-19 11:00:06 [!]  Auto Mode will be enabled by default in an upcoming release of eksctl. This means managed node groups and managed networking add-ons will no longer be created by default. To maintain current behavior, explicitly set 'autoModeConfig.enabled: false' in your cluster configuration. Learn more: https://eksctl.io/usage/auto-mode/
-2026-06-19 11:00:06 [ℹ]  using Kubernetes version 1.34
-2026-06-19 11:00:06 [ℹ]  creating EKS cluster "jenkins-cluster" in "us-east-2" region with managed nodes
-2026-06-19 11:00:06 [ℹ]  will create 2 separate CloudFormation stacks for cluster itself and the initial managed nodegroup
-2026-06-19 11:00:06 [ℹ]  if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=us-east-2 --cluster=jenkins-cluster'
-2026-06-19 11:00:06 [ℹ]  Kubernetes API endpoint access will use default of {publicAccess=true, privateAccess=false} for cluster "jenkins-cluster" in "us-east-2"
-2026-06-19 11:00:06 [ℹ]  CloudWatch logging will not be enabled for cluster "jenkins-cluster" in "us-east-2"
-2026-06-19 11:00:06 [ℹ]  you can enable it with 'eksctl utils update-cluster-logging --enable-types={SPECIFY-YOUR-LOG-TYPES-HERE (e.g. all)} --region=us-east-2 --cluster=jenkins-cluster'
-2026-06-19 11:00:06 [ℹ]  default addons vpc-cni, kube-proxy, coredns, metrics-server were not specified, will install them as EKS addons
-2026-06-19 11:00:06 [ℹ]  
-2 sequential tasks: { create cluster control plane "jenkins-cluster", 
-    2 sequential sub-tasks: { 
-        2 sequential sub-tasks: { 
-            1 task: { create addons },
-            wait for control plane to become ready,
-        },
-        create managed nodegroup "jenkins-nodegroup",
-    } 
-}
-2026-06-19 11:00:06 [ℹ]  building cluster stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:00:06 [ℹ]  deploying stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:00:36 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:01:06 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:02:06 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:03:06 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:04:06 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:05:06 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:06:06 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:07:07 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:08:07 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:09:07 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:10:07 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-cluster"
-2026-06-19 11:10:08 [!]  recommended policies were found for "vpc-cni" addon, but since OIDC is disabled on the cluster, eksctl cannot configure the requested permissions; the recommended way to provide IAM permissions for "vpc-cni" addon is via pod identity associations; after addon creation is completed, add all recommended policies to the config file, under `addon.PodIdentityAssociations`, and run `eksctl update addon`
-2026-06-19 11:10:08 [ℹ]  creating addon: vpc-cni
-2026-06-19 11:10:09 [ℹ]  successfully created addon: vpc-cni
-2026-06-19 11:10:09 [ℹ]  creating addon: kube-proxy
-2026-06-19 11:10:09 [ℹ]  successfully created addon: kube-proxy
-2026-06-19 11:10:09 [ℹ]  creating addon: coredns
-2026-06-19 11:10:10 [ℹ]  successfully created addon: coredns
-2026-06-19 11:12:11 [ℹ]  building managed nodegroup stack "eksctl-jenkins-cluster-nodegroup-jenkins-nodegroup"
-2026-06-19 11:12:11 [ℹ]  deploying stack "eksctl-jenkins-cluster-nodegroup-jenkins-nodegroup"
-2026-06-19 11:12:11 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-nodegroup-jenkins-nodegroup"
-2026-06-19 11:12:41 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-nodegroup-jenkins-nodegroup"
-2026-06-19 11:13:16 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-nodegroup-jenkins-nodegroup"
-2026-06-19 11:14:09 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-nodegroup-jenkins-nodegroup"
-2026-06-19 11:15:49 [ℹ]  waiting for CloudFormation stack "eksctl-jenkins-cluster-nodegroup-jenkins-nodegroup"
-2026-06-19 11:15:49 [ℹ]  waiting for the control plane to become ready
-2026-06-19 11:15:50 [✔]  saved kubeconfig as "/home/ubuntu/.kube/config"
-2026-06-19 11:15:50 [ℹ]  no tasks
-2026-06-19 11:15:50 [✔]  all EKS cluster resources for "jenkins-cluster" have been created
-2026-06-19 11:15:50 [ℹ]  nodegroup "jenkins-nodegroup" has 2 node(s)
-2026-06-19 11:15:50 [ℹ]  node "ip-192-168-5-186.us-east-2.compute.internal" is ready
-2026-06-19 11:15:50 [ℹ]  node "ip-192-168-59-165.us-east-2.compute.internal" is ready
-2026-06-19 11:15:50 [ℹ]  waiting for at least 2 node(s) to become ready in "jenkins-nodegroup"
-2026-06-19 11:15:50 [ℹ]  nodegroup "jenkins-nodegroup" has 2 node(s)
-2026-06-19 11:15:50 [ℹ]  node "ip-192-168-5-186.us-east-2.compute.internal" is ready
-2026-06-19 11:15:50 [ℹ]  node "ip-192-168-59-165.us-east-2.compute.internal" is ready
-2026-06-19 11:15:50 [✔]  created 1 managed nodegroup(s) in cluster "jenkins-cluster"
-2026-06-19 11:15:50 [ℹ]  creating addon: metrics-server
-2026-06-19 11:15:50 [ℹ]  successfully created addon: metrics-server
-2026-06-19 11:15:51 [ℹ]  kubectl command should work with "/home/ubuntu/.kube/config", try 'kubectl get nodes'
-2026-06-19 11:15:51 [✔]  EKS cluster "jenkins-cluster" in "us-east-2" region is ready
-
-======================================
-VERIFY CLUSTER
-======================================
-NAME		REGION		EKSCTL CREATED
-jenkins-cluster	us-east-2	True
-
-======================================
-VERIFY NODES
-======================================
-NAME                                           STATUS   ROLES    AGE     VERSION               INTERNAL-IP      EXTERNAL-IP      OS-IMAGE                        KERNEL-VERSION                    CONTAINER-RUNTIME
-ip-192-168-5-186.us-east-2.compute.internal    Ready    <none>   2m16s   v1.34.9-eks-93b80c6   192.168.5.186    3.17.185.246     Amazon Linux 2023.12.20260611   6.12.90-120.164.amzn2023.x86_64   containerd://2.2.4+unknown
-ip-192-168-59-165.us-east-2.compute.internal   Ready    <none>   2m15s   v1.34.9-eks-93b80c6   192.168.59.165   18.225.178.145   Amazon Linux 2023.12.20260611   6.12.90-120.164.amzn2023.x86_64   containerd://2.2.4+unknown
-
-======================================
-VERIFY PODS
-======================================
-NAMESPACE     NAME                       READY   STATUS    RESTARTS   AGE
-kube-system   aws-node-7dp4m             2/2     Running   0          2m14s
-kube-system   aws-node-pp6pd             2/2     Running   0          2m16s
-kube-system   coredns-6d6c454fdb-4wbf4   1/1     Running   0          5m34s
-kube-system   coredns-6d6c454fdb-86kwj   1/1     Running   0          5m34s
-kube-system   kube-proxy-xh9v8           1/1     Running   0          2m14s
-kube-system   kube-proxy-xqkqj           1/1     Running   0          2m15s
-
-======================================
-DONE
-======================================
-ubuntu@ip-172-31-39-80:~$ 
