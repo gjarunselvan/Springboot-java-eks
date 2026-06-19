@@ -1,32 +1,35 @@
-echo "===== DEPLOYMENT ====="
-kubectl get deployment springboot-app
+#!/bin/bash
+
+echo "=================================="
+echo "IAM ROLE CHECK"
+echo "=================================="
+aws iam get-role --role-name ec2-eks-role --query 'Role.RoleName' --output text
 
 echo ""
-echo "===== PODS ====="
-kubectl get pods -o wide
+echo "=================================="
+echo "SECURITY GROUP CHECK"
+echo "=================================="
+aws ec2 describe-security-groups \
+--filters "Name=group-name,Values=jenkins-server-security-group" \
+--query 'SecurityGroups[*].[GroupName,GroupId,VpcId]' \
+--output table
 
 echo ""
-echo "===== SERVICE ====="
-kubectl get svc
+echo "=================================="
+echo "EC2 CHECK"
+echo "=================================="
+aws ec2 describe-instances \
+--filters "Name=tag:Name,Values=jenkins-server" \
+"Name=instance-state-name,Values=running,pending" \
+--query 'Reservations[*].Instances[*].[InstanceId,InstanceType,State.Name,PrivateIpAddress]' \
+--output table
 
 echo ""
-echo "===== LOAD BALANCER ====="
-kubectl get svc springboot-service
-===== DEPLOYMENT =====
-NAME             READY   UP-TO-DATE   AVAILABLE   AGE
-springboot-app   2/2     2            2           34m
-
-===== PODS =====
-NAME                              READY   STATUS    RESTARTS   AGE   IP               NODE                                           NOMINATED NODE   READINESS GATES
-springboot-app-864d4784dc-hhqzp   1/1     Running   0          34m   192.168.58.110   ip-192-168-59-165.us-east-2.compute.internal   <none>           <none>
-springboot-app-864d4784dc-pkqc5   1/1     Running   0          34m   192.168.21.138   ip-192-168-5-186.us-east-2.compute.internal    <none>           <none>
-
-===== SERVICE =====
-NAME                 TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
-kubernetes           ClusterIP      10.100.0.1       <none>                                                                    443/TCP        50m
-springboot-service   LoadBalancer   10.100.194.153   ab9b6680c8d644021bbe80a2ad48a0cf-1028343197.us-east-2.elb.amazonaws.com   80:30103/TCP   34m
-
-===== LOAD BALANCER =====
-NAME                 TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
-springboot-service   LoadBalancer   10.100.194.153   ab9b6680c8d644021bbe80a2ad48a0cf-1028343197.us-east-2.elb.amazonaws.com   80:30103/TCP   34m
-ubuntu@ip-172-31-39-80:~$ 
+echo "=================================="
+echo "SUMMARY"
+echo "=================================="
+echo "Expected:"
+echo "Role = ec2-eks-role"
+echo "Security Group = jenkins-server-security-group"
+echo "EC2 Name = jenkins-server"
+echo "EC2 Type = t3.small"
