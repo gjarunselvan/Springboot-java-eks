@@ -1,78 +1,80 @@
-#!/bin/bash
+==================================
+DISK BEFORE
+==================================
+Filesystem       Size  Used Avail Use% Mounted on
+/dev/root        6.7G  4.5G  2.2G  68% /
+tmpfs            953M     0  953M   0% /dev/shm
+tmpfs            382M  976K  381M   1% /run
+efivarfs         128K  3.1K  120K   3% /sys/firmware/efi/efivars
+tmpfs            953M  101M  853M  11% /tmp
+none             1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
+none             1.0M     0  1.0M   0% /run/credentials/systemd-resolved.service
+/dev/nvme0n1p13  989M   96M  827M  11% /boot
+/dev/nvme0n1p15  105M  6.3M   99M   7% /boot/efi
+none             1.0M     0  1.0M   0% /run/credentials/systemd-networkd.service
+none             1.0M     0  1.0M   0% /run/credentials/getty@tty1.service
+none             1.0M     0  1.0M   0% /run/credentials/serial-getty@ttyS0.service
+tmpfs            191M  8.0K  191M   1% /run/user/1000
 
-echo "=================================="
-echo "DISK BEFORE"
-echo "=================================="
-df -h
+==================================
+STOP JENKINS
+==================================
 
-echo ""
-echo "=================================="
-echo "STOP JENKINS"
-echo "=================================="
-pkill -f jenkins.war || true
+==================================
+CLEAN TEMP
+==================================
 
-echo ""
-echo "=================================="
-echo "CLEAN TEMP"
-echo "=================================="
-sudo rm -rf /tmp/*
-sudo rm -rf /var/tmp/*
+==================================
+CREATE JENKINS DIR
+==================================
 
-echo ""
-echo "=================================="
-echo "CREATE JENKINS DIR"
-echo "=================================="
-mkdir -p $HOME/jenkins
+==================================
+MOVE JENKINS WAR
+==================================
 
-echo ""
-echo "=================================="
-echo "MOVE JENKINS WAR"
-echo "=================================="
-if [ -f /tmp/jenkins.war ]; then
-    mv /tmp/jenkins.war $HOME/jenkins/
-fi
+==================================
+START JENKINS
+==================================
+[1] 11387
 
-echo ""
-echo "=================================="
-echo "START JENKINS"
-echo "=================================="
-nohup java -jar $HOME/jenkins/jenkins.war \
---httpPort=8080 \
-> $HOME/jenkins/jenkins.log 2>&1 &
+[1]+  Exit 1                     nohup java -jar $HOME/jenkins/jenkins.war --httpPort=8080 > $HOME/jenkins/jenkins.log 2>&1
+WAITING 30 SECONDS...
 
-echo ""
-echo "WAITING 30 SECONDS..."
-sleep 30
+==================================
+VERIFY JENKINS
+==================================
+ubuntu     11432   11173  0 13:30 pts/1    00:00:00 grep --color=auto jenkins.war
 
-echo ""
-echo "=================================="
-echo "VERIFY JENKINS"
-echo "=================================="
-ps -ef | grep jenkins.war
 
-echo ""
-ss -tulpn | grep 8080
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0
+curl: (7) Failed to connect to localhost port 8080 after 0 ms: Could not connect to server
 
-echo ""
-curl -I http://localhost:8080 | head -5
+==================================
+DISK AFTER
+==================================
+Filesystem       Size  Used Avail Use% Mounted on
+/dev/root        6.7G  4.5G  2.2G  68% /
+tmpfs            953M     0  953M   0% /dev/shm
+tmpfs            382M  976K  381M   1% /run
+efivarfs         128K  3.1K  120K   3% /sys/firmware/efi/efivars
+tmpfs            953M     0  953M   0% /tmp
+none             1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
+none             1.0M     0  1.0M   0% /run/credentials/systemd-resolved.service
+/dev/nvme0n1p13  989M   96M  827M  11% /boot
+/dev/nvme0n1p15  105M  6.3M   99M   7% /boot/efi
+none             1.0M     0  1.0M   0% /run/credentials/systemd-networkd.service
+none             1.0M     0  1.0M   0% /run/credentials/getty@tty1.service
+none             1.0M     0  1.0M   0% /run/credentials/serial-getty@ttyS0.service
+tmpfs            191M  8.0K  191M   1% /run/user/1000
 
-echo ""
-echo "=================================="
-echo "DISK AFTER"
-echo "=================================="
-df -h
+==================================
+EKS STATUS
+==================================
+CREATING
 
-echo ""
-echo "=================================="
-echo "EKS STATUS"
-echo "=================================="
-aws eks describe-cluster \
---name jenkins-cluster \
---region us-east-2 \
---query 'cluster.status' \
---output text
-
-echo ""
-echo "=================================="
-echo "DONE"
-echo "=================================="
+==================================
+DONE
+==================================
+ubuntu@ip-172-31-47-234:~$ 
