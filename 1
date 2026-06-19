@@ -1,9 +1,78 @@
-Built-In Node
-Bring this node back online
-Update offline reason
-This is the Jenkins controller's built-in node. Builds running on this node will execute on the same system and as the same user as the Jenkins controller. This is appropriate e.g. for special jobs performing backups, but in general you should run builds on agents. Learn more about distributed builds.
-Disk space is below threshold of 1.00 GiB. Only 852.53 MiB out of 952.61 MiB left on /tmp.
+#!/bin/bash
 
-Monitoring Data
-Projects tied to Built-In Node
-None
+echo "=================================="
+echo "DISK BEFORE"
+echo "=================================="
+df -h
+
+echo ""
+echo "=================================="
+echo "STOP JENKINS"
+echo "=================================="
+pkill -f jenkins.war || true
+
+echo ""
+echo "=================================="
+echo "CLEAN TEMP"
+echo "=================================="
+sudo rm -rf /tmp/*
+sudo rm -rf /var/tmp/*
+
+echo ""
+echo "=================================="
+echo "CREATE JENKINS DIR"
+echo "=================================="
+mkdir -p $HOME/jenkins
+
+echo ""
+echo "=================================="
+echo "MOVE JENKINS WAR"
+echo "=================================="
+if [ -f /tmp/jenkins.war ]; then
+    mv /tmp/jenkins.war $HOME/jenkins/
+fi
+
+echo ""
+echo "=================================="
+echo "START JENKINS"
+echo "=================================="
+nohup java -jar $HOME/jenkins/jenkins.war \
+--httpPort=8080 \
+> $HOME/jenkins/jenkins.log 2>&1 &
+
+echo ""
+echo "WAITING 30 SECONDS..."
+sleep 30
+
+echo ""
+echo "=================================="
+echo "VERIFY JENKINS"
+echo "=================================="
+ps -ef | grep jenkins.war
+
+echo ""
+ss -tulpn | grep 8080
+
+echo ""
+curl -I http://localhost:8080 | head -5
+
+echo ""
+echo "=================================="
+echo "DISK AFTER"
+echo "=================================="
+df -h
+
+echo ""
+echo "=================================="
+echo "EKS STATUS"
+echo "=================================="
+aws eks describe-cluster \
+--name jenkins-cluster \
+--region us-east-2 \
+--query 'cluster.status' \
+--output text
+
+echo ""
+echo "=================================="
+echo "DONE"
+echo "=================================="
