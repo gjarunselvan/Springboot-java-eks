@@ -1,94 +1,40 @@
-#!/bin/bash
+LAB VALIDATION CHECK
+======================================
 
-score=0
-total=8
+1. EC2 Name Check
+PASS
 
-echo "======================================"
-echo "LAB VALIDATION CHECK"
-echo "======================================"
+2. Jenkins Check
+FAIL
 
-echo ""
-echo "1. EC2 Name Check"
-NAME=$(curl -s http://169.254.169.254/latest/meta-data/instance-id >/dev/null 2>&1 && echo "jenkins-server")
-if [ "$NAME" = "jenkins-server" ]; then
-  echo "PASS"
-  ((score++))
-else
-  echo "FAIL"
-fi
+3. Docker Check
+PASS
 
-echo ""
-echo "2. Jenkins Check"
-if systemctl is-active --quiet jenkins; then
-  echo "PASS"
-  ((score++))
-else
-  echo "FAIL"
-fi
+4. Docker Volume Check
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+FAIL
 
-echo ""
-echo "3. Docker Check"
-if command -v docker >/dev/null 2>&1; then
-  echo "PASS"
-  ((score++))
-else
-  echo "FAIL"
-fi
+5. Docker Network Check
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+FAIL
 
-echo ""
-echo "4. Docker Volume Check"
-if docker volume ls | grep -q jenkins_data; then
-  echo "PASS"
-  ((score++))
-else
-  echo "FAIL"
-fi
+6. AWS CLI Check
+PASS
 
-echo ""
-echo "5. Docker Network Check"
-if docker network ls | grep -q jenkins_network; then
-  echo "PASS"
-  ((score++))
-else
-  echo "FAIL"
-fi
+7. kubectl Check
+PASS
 
-echo ""
-echo "6. AWS CLI Check"
-if command -v aws >/dev/null 2>&1; then
-  echo "PASS"
-  ((score++))
-else
-  echo "FAIL"
-fi
+8. eksctl Check
+PASS
 
-echo ""
-echo "7. kubectl Check"
-if command -v kubectl >/dev/null 2>&1; then
-  echo "PASS"
-  ((score++))
-else
-  echo "FAIL"
-fi
+======================================
+SCORE: 5 / 8
+======================================
 
-echo ""
-echo "8. eksctl Check"
-if command -v eksctl >/dev/null 2>&1; then
-  echo "PASS"
-  ((score++))
-else
-  echo "FAIL"
-fi
-
-echo ""
-echo "======================================"
-echo "SCORE: $score / $total"
-echo "======================================"
-
-echo ""
-echo "NEXT BIG ITEMS STILL NEEDED FOR FULL MARKS:"
-echo "- ECR Repository: springboot-jenkins-ecr-repo"
-echo "- EKS Cluster: jenkins-cluster"
-echo "- Nodegroup: jenkins-nodegroup"
-echo "- Jenkins Pipeline SUCCESS"
-echo "- Kubernetes Deployment Running"
+NEXT BIG ITEMS STILL NEEDED FOR FULL MARKS:
+- ECR Repository: springboot-jenkins-ecr-repo
+- EKS Cluster: jenkins-cluster
+- Nodegroup: jenkins-nodegroup
+- Jenkins Pipeline SUCCESS
+- Kubernetes Deployment Running
+ubuntu@ip-172-31-47-234:~$ 
