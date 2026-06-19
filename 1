@@ -1,87 +1,96 @@
-#!/bin/bash
+==================================
+DISK BEFORE
+==================================
+Filesystem       Size  Used Avail Use% Mounted on
+/dev/root        6.7G  4.6G  2.1G  69% /
+tmpfs            953M     0  953M   0% /dev/shm
+tmpfs            382M  980K  381M   1% /run
+efivarfs         128K  3.1K  120K   3% /sys/firmware/efi/efivars
+tmpfs            953M  4.8M  948M   1% /tmp
+none             1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
+none             1.0M     0  1.0M   0% /run/credentials/systemd-resolved.service
+/dev/nvme0n1p13  989M   96M  827M  11% /boot
+/dev/nvme0n1p15  105M  6.3M   99M   7% /boot/efi
+none             1.0M     0  1.0M   0% /run/credentials/systemd-networkd.service
+none             1.0M     0  1.0M   0% /run/credentials/getty@tty1.service
+none             1.0M     0  1.0M   0% /run/credentials/serial-getty@ttyS0.service
+tmpfs            191M  8.0K  191M   1% /run/user/1000
 
-echo "=================================="
-echo "DISK BEFORE"
-echo "=================================="
-df -h
+==================================
+CLEAN APT CACHE
+==================================
 
-echo ""
-echo "=================================="
-echo "CLEAN APT CACHE"
-echo "=================================="
-sudo apt clean
+==================================
+CLEAN TMP
+==================================
 
-echo ""
-echo "=================================="
-echo "CLEAN TMP"
-echo "=================================="
-sudo rm -rf /tmp/*
-sudo rm -rf /var/tmp/*
+==================================
+CLEAN DOCKER
+==================================
+Deleted Networks:
+jenkins_network
 
-echo ""
-echo "=================================="
-echo "CLEAN DOCKER"
-echo "=================================="
-sudo docker system prune -af
-sudo docker volume prune -f
+Total reclaimed space: 0B
+Total reclaimed space: 0B
 
-echo ""
-echo "=================================="
-echo "CHECK JENKINS DIRECTORY"
-echo "=================================="
-mkdir -p $HOME/jenkins
+==================================
+CHECK JENKINS DIRECTORY
+==================================
 
-if [ ! -f $HOME/jenkins/jenkins.war ]; then
-    echo "Downloading Jenkins..."
-    cd $HOME/jenkins
-    curl -L -o jenkins.war https://get.jenkins.io/war-stable/latest/jenkins.war
-fi
+==================================
+START JENKINS
+==================================
+[1] 13986
 
-echo ""
-echo "=================================="
-echo "START JENKINS"
-echo "=================================="
-pkill -f jenkins.war || true
+WAIT 60 SECONDS...
 
-nohup java -jar $HOME/jenkins/jenkins.war \
---httpPort=8080 \
-> $HOME/jenkins/jenkins.log 2>&1 &
+==================================
+JENKINS CHECK
+==================================
+ubuntu     13986    1742 53 13:50 pts/0    00:00:32 java -jar /home/ubuntu/jenkins/jenkins.war --httpPort=8080
+ubuntu     14101    1742  0 13:51 pts/0    00:00:00 grep --color=auto jenkins.war
 
-echo ""
-echo "WAIT 60 SECONDS..."
-sleep 60
+tcp   LISTEN 0      50                      *:8080             *:*    users:(("java",pid=13986,fd=9))
 
-echo ""
-echo "=================================="
-echo "JENKINS CHECK"
-echo "=================================="
-ps -ef | grep jenkins.war
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0
+HTTP/1.1 403 Forbidden
+Server: Jetty(12.1.8)
+Date: Fri, 19 Jun 2026 13:51:48 GMT
+X-Content-Type-Options: nosniff
+Reporting-Endpoints: content-security-policy: http://3.16.113.69:8080/content-security-policy-reporting-endpoint/Y5v_mrFpoVrYunha5xLYAqOZBaJeNO8o-2qHcH1LRKY=:YW5vbnltb3Vz::Lw==
 
-echo ""
-ss -tulpn | grep 8080
+==================================
+TOOLS CHECK
+==================================
+/usr/bin/docker
+/usr/local/bin/aws
+/usr/local/bin/kubectl
+Docker version 29.1.3, build 29.1.3-0ubuntu4.1
+aws-cli/2.35.8 Python/3.14.5 Linux/7.0.0-1006-aws exe/x86_64.ubuntu.26
+Client Version: v1.36.2
+Kustomize Version: v5.8.1
 
-echo ""
-curl -I http://localhost:8080 | head -5
+==================================
+DISK AFTER
+==================================
+Filesystem       Size  Used Avail Use% Mounted on
+/dev/root        6.7G  4.5G  2.2G  68% /
+tmpfs            953M     0  953M   0% /dev/shm
+tmpfs            382M  972K  381M   1% /run
+efivarfs         128K  3.1K  120K   3% /sys/firmware/efi/efivars
+tmpfs            953M  4.8M  948M   1% /tmp
+none             1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
+none             1.0M     0  1.0M   0% /run/credentials/systemd-resolved.service
+/dev/nvme0n1p13  989M   96M  827M  11% /boot
+/dev/nvme0n1p15  105M  6.3M   99M   7% /boot/efi
+none             1.0M     0  1.0M   0% /run/credentials/systemd-networkd.service
+none             1.0M     0  1.0M   0% /run/credentials/getty@tty1.service
+none             1.0M     0  1.0M   0% /run/credentials/serial-getty@ttyS0.service
+tmpfs            191M  8.0K  191M   1% /run/user/1000
 
-echo ""
-echo "=================================="
-echo "TOOLS CHECK"
-echo "=================================="
-which docker
-which aws
-which kubectl
-
-docker --version
-aws --version
-kubectl version --client
-
-echo ""
-echo "=================================="
-echo "DISK AFTER"
-echo "=================================="
-df -h
-
-echo ""
-echo "=================================="
-echo "DONE"
-echo "=================================="
+==================================
+DONE
+==================================
+ubuntu@ip-172-31-47-234:~$ 
