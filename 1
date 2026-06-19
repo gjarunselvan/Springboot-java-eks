@@ -1,56 +1,45 @@
-#!/bin/bash
+==================================
+FULL JENKINS RESTART
+==================================
 
-echo "=================================="
-echo "FULL JENKINS RESTART"
-echo "=================================="
+VERIFY UBUNTU GROUPS
+uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),4(adm),24(cdrom),27(sudo),30(dip),102(lxd),109(docker)
 
-pkill -9 -f jenkins.war || true
+VERIFY DOCKER
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
 
-sleep 5
+START JENKINS
+[1] 18327
 
-echo ""
-echo "VERIFY UBUNTU GROUPS"
-id ubuntu
+WAIT 30 SECONDS
+^C
 
-echo ""
-echo "VERIFY DOCKER"
-docker ps
+VERIFY PROCESS
+ubuntu     18327    1742 99 14:25 pts/0    00:00:22 java -jar /home/ubuntu/jenkins/jenkins.war --httpPort=8080
 
-echo ""
-echo "START JENKINS"
+VERIFY PORT
+tcp   LISTEN 0      50                      *:8080             *:*    users:(("java",pid=18327,fd=9))
 
-nohup java -jar /home/ubuntu/jenkins/jenkins.war \
---httpPort=8080 \
-> /home/ubuntu/jenkins/jenkins.log 2>&1 &
+VERIFY WEB
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0
+HTTP/1.1 403 Forbidden
+Server: Jetty(12.1.8)
+Date: Fri, 19 Jun 2026 14:25:33 GMT
+X-Content-Type-Options: nosniff
+Reporting-Endpoints: content-security-policy: http://3.16.113.69:8080/content-security-policy-reporting-endpoint/Y5v_mrFpoVrYunha5xLYAqOZBaJeNO8o-2qHcH1LRKY=:YW5vbnltb3Vz::Lw==
 
-echo ""
-echo "WAIT 30 SECONDS"
-sleep 30
+VERIFY PROCESS GROUPS
+USER         PID CMD
+ubuntu     18327 java -jar /home/ubuntu/jenkins/jenkins.war --httpPort=8080
 
-echo ""
-echo "VERIFY PROCESS"
-ps -ef | grep jenkins.war | grep -v grep
-
-echo ""
-echo "VERIFY PORT"
-ss -tulpn | grep 8080
-
-echo ""
-echo "VERIFY WEB"
-curl -I http://localhost:8080 | head -5
-
-echo ""
-echo "VERIFY PROCESS GROUPS"
-PID=$(pgrep -f jenkins.war | head -1)
-
-ps -o user,pid,cmd -p $PID
-
-echo ""
-echo "=================================="
-echo "READY"
-echo "=================================="
-echo "1. Logout Jenkins"
-echo "2. Close browser"
-echo "3. Open Jenkins again"
-echo "4. Login"
-echo "5. Build Now"
+==================================
+READY
+==================================
+1. Logout Jenkins
+2. Close browser
+3. Open Jenkins again
+4. Login
+5. Build Now
+ubuntu@ip-172-31-47-234:~$ 
