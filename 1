@@ -1,34 +1,76 @@
-==========================================
-      JENKINS + EKS LAB VALIDATION
-==========================================
+#!/bin/bash
 
-1. EC2 INSTANCE (jenkins-server)
-FAIL - jenkins-server not found
+REGION="us-east-2"
 
-2. IAM ROLE (ec2-eks-role)
-PASS - ec2-eks-role found
+echo "===== JENKINS ====="
+if systemctl is-active --quiet jenkins; then
+    echo "PASS: Jenkins running"
+else
+    echo "FIX: Starting Jenkins"
+    sudo systemctl start jenkins
+fi
 
-3. SECURITY GROUP (jenkins-server-security-group)
-FAIL - Security Group missing
+echo ""
+echo "===== DOCKER VOLUME ====="
+if docker volume ls | grep -q jenkins_data; then
+    echo "PASS: jenkins_data exists"
+else
+    echo "FIX: Creating jenkins_data"
+    docker volume create jenkins_data
+fi
 
-4. JENKINS
-PASS - Jenkins running
+echo ""
+echo "===== DOCKER NETWORK ====="
+if docker network ls | grep -q jenkins_network; then
+    echo "PASS: jenkins_network exists"
+else
+    echo "FIX: Creating jenkins_network"
+    docker network create jenkins_network
+fi
 
-5. DOCKER VOLUME (jenkins_data)
-FAIL - jenkins_data missing
+echo ""
+echo "===== ECR ====="
+aws ecr describe-repositories \
+--repository-names springboot-jenkins-ecr-repo \
+--region $REGION >/dev/null 2>&1
 
-6. DOCKER NETWORK (jenkins_network)
-FAIL - jenkins_network missing
+if [ $? -eq 0 ]; then
+    echo "PASS: ECR exists"
+else
+    echo "FIX: Creating ECR"
+    aws ecr create-repository \
+    --repository-name springboot-jenkins-ecr-repo \
+    --region $REGION
+fi
 
-7. ECR REPOSITORY (springboot-jenkins-ecr-repo)
-FAIL - ECR missing
+echo ""
+echo "===== EKS CLUSTER ====="
+aws eks describe-cluster \
+--name jenkins-cluster \
+--region $REGION >/dev/null 2>&1
 
-8. EKS CLUSTER + NODEGROUP
-FAIL - EKS or Nodegroup missing
+if [ $? -eq 0 ]; then
+    echo "PASS: Cluster exists"
+else
+    echo "MISSING: Create cluster manually"
+    echo "eksctl create cluster --name jenkins-cluster --region $REGION --nodegroup-name jenkins-nodegroup --node-type t3.medium --nodes 2"
+fi
 
-==========================================
-RESULT: 2 / 8
-==========================================
-COMPLETE REMAINING FAILED ITEMS
-labuser@ip-172-31-6-199:~$ ^C
-labuser@ip-172-31-6-199:~$ 
+echo ""
+echo "===== NODEGROUP ====="
+aws eks describe-nodegroup \
+--cluster-name jenkins-cluster \
+--nodegroup-name jenkins-nodegroup \
+--region $REGION >/dev/null 2>&1
+
+if [ $? -eq 0 ]; then
+    echo "PASS: Nodegroup exists"
+else
+    echo "MISSING: Nodegroup not found"
+fi
+
+echo ""
+echo "===== FINAL STATUS ====="
+sudo systemctl is-active jenkins
+docker volume ls | grep jenkins
+docker network ls | grep jenkins
