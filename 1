@@ -2,21 +2,18 @@ Started by user Jenkins Admin
 Checking out git https://github.com/gjarunselvan/springboot-jenkins-eks.git into /var/lib/jenkins/workspace/springboot-jenkins-eks-pipeline@script/b1cd767f4a1eea3cad7694f80308b48592ea69a417e646264771f36102acbec5 to read Jenkinsfile
 The recommended git tool is: NONE
 using credential git
-Cloning the remote Git repository
-Cloning repository https://github.com/gjarunselvan/springboot-jenkins-eks.git
- > git init /var/lib/jenkins/workspace/springboot-jenkins-eks-pipeline@script/b1cd767f4a1eea3cad7694f80308b48592ea69a417e646264771f36102acbec5 # timeout=10
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/springboot-jenkins-eks-pipeline@script/b1cd767f4a1eea3cad7694f80308b48592ea69a417e646264771f36102acbec5/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/gjarunselvan/springboot-jenkins-eks.git # timeout=10
 Fetching upstream changes from https://github.com/gjarunselvan/springboot-jenkins-eks.git
  > git --version # timeout=10
  > git --version # 'git version 2.53.0'
 using GIT_ASKPASS to set credentials git
  > git fetch --tags --force --progress -- https://github.com/gjarunselvan/springboot-jenkins-eks.git +refs/heads/*:refs/remotes/origin/* # timeout=10
- > git config remote.origin.url https://github.com/gjarunselvan/springboot-jenkins-eks.git # timeout=10
- > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
-Avoid second fetch
  > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
-Checking out Revision f591c022b3132c5185546d5a5af0bfe18ede95ef (refs/remotes/origin/main)
+Checking out Revision 536bbae60cc6c673018e9533730ef9b5743ea481 (refs/remotes/origin/main)
  > git config core.sparsecheckout # timeout=10
- > git checkout -f f591c022b3132c5185546d5a5af0bfe18ede95ef # timeout=10
+ > git checkout -f 536bbae60cc6c673018e9533730ef9b5743ea481 # timeout=10
 Commit message: "Update Jenkinsfile"
 First time build. Skipping changelog.
 org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:
