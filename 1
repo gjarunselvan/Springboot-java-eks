@@ -1,45 +1,41 @@
-==================================
-FULL JENKINS RESTART
-==================================
+#!/bin/bash
 
-VERIFY UBUNTU GROUPS
-uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),4(adm),24(cdrom),27(sudo),30(dip),102(lxd),109(docker)
+echo "=================================="
+echo "JENKINS + DOCKER VALIDATION"
+echo "=================================="
 
-VERIFY DOCKER
-permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+echo ""
+echo "1. JENKINS USER"
+id jenkins
 
-START JENKINS
-[1] 18327
+echo ""
+echo "2. JENKINS GROUPS"
+groups jenkins
 
-WAIT 30 SECONDS
-^C
+echo ""
+echo "3. DOCKER SOCKET"
+ls -l /var/run/docker.sock
 
-VERIFY PROCESS
-ubuntu     18327    1742 99 14:25 pts/0    00:00:22 java -jar /home/ubuntu/jenkins/jenkins.war --httpPort=8080
+echo ""
+echo "4. JENKINS CAN ACCESS DOCKER"
+sudo su - jenkins -c "docker ps"
 
-VERIFY PORT
-tcp   LISTEN 0      50                      *:8080             *:*    users:(("java",pid=18327,fd=9))
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "PASS - Jenkins user can access Docker"
+else
+    echo ""
+    echo "FAIL - Jenkins user cannot access Docker"
+fi
 
-VERIFY WEB
-  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-                                 Dload  Upload  Total   Spent   Left   Speed
-  0      0   0      0   0      0      0      0                              0
-HTTP/1.1 403 Forbidden
-Server: Jetty(12.1.8)
-Date: Fri, 19 Jun 2026 14:25:33 GMT
-X-Content-Type-Options: nosniff
-Reporting-Endpoints: content-security-policy: http://3.16.113.69:8080/content-security-policy-reporting-endpoint/Y5v_mrFpoVrYunha5xLYAqOZBaJeNO8o-2qHcH1LRKY=:YW5vbnltb3Vz::Lw==
+echo ""
+echo "5. WHOAMI AS JENKINS"
+sudo su - jenkins -c "whoami"
 
-VERIFY PROCESS GROUPS
-USER         PID CMD
-ubuntu     18327 java -jar /home/ubuntu/jenkins/jenkins.war --httpPort=8080
-
-==================================
-READY
-==================================
-1. Logout Jenkins
-2. Close browser
-3. Open Jenkins again
-4. Login
-5. Build Now
-ubuntu@ip-172-31-47-234:~$ 
+echo ""
+echo "=================================="
+echo "EXPECTED"
+echo "=================================="
+echo "whoami = jenkins"
+echo "docker ps = works"
+echo "jenkins in docker group"
