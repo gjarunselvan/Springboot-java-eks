@@ -1,4 +1,4 @@
-sudo rm -f /etc/apt/sources.list.d/jenkins.list
+ubuntu@ip-172-31-47-234:~$ sudo rm -f /etc/apt/sources.list.d/jenkins.list
 sudo rm -f /usr/share/keyrings/jenkins-keyring.asc
 
 curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | \
@@ -18,3 +18,25 @@ sudo systemctl start jenkins
 sleep 10
 
 systemctl is-active jenkins
+deb [signed-by=/usr/share/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/
+Hit:1 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute InRelease
+Hit:2 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-updates InRelease                       
+Hit:3 http://us-east-2.ec2.archive.ubuntu.com/ubuntu resolute-backports InRelease                     
+Ign:4 https://pkg.jenkins.io/debian-stable binary/ InRelease                                          
+Hit:5 http://security.ubuntu.com/ubuntu resolute-security InRelease   
+Get:6 https://pkg.jenkins.io/debian-stable binary/ Release [2044 B]
+Get:7 https://pkg.jenkins.io/debian-stable binary/ Release.gpg [833 B]
+Ign:7 https://pkg.jenkins.io/debian-stable binary/ Release.gpg
+Warning: OpenPGP signature verification failed: https://pkg.jenkins.io/debian-stable binary/ Release: The following signatures couldn't be verified because the public key is not available: NO_PUBKEY 7198F4B714ABFC68
+Error: The repository 'https://pkg.jenkins.io/debian-stable binary/ Release' is not signed.
+Notice: Updating from such a repository can't be done securely, and is therefore disabled by default.
+Notice: See apt-secure(8) manpage for repository creation and user configuration details.
+Package jenkins is not available, but is referred to by another package.
+This may mean that the package is missing, has been obsoleted, or
+is only available from another source
+
+Error: Package 'jenkins' has no installation candidate
+Failed to enable unit: Unit jenkins.service does not exist
+Failed to start jenkins.service: Unit jenkins.service not found.
+inactive
+ubuntu@ip-172-31-47-234:~$ 
