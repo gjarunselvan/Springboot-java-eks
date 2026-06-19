@@ -1,18 +1,78 @@
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+#!/bin/bash
 
-chmod +x kubectl
+echo "======================================"
+echo "STEP 1 - EC2 HOSTNAME"
+echo "======================================"
+hostname
 
-sudo mv kubectl /usr/local/bin/
+echo ""
+echo "======================================"
+echo "STEP 2 - JAVA"
+echo "======================================"
+java -version
 
-kubectl version --client
+echo ""
+echo "======================================"
+echo "STEP 3 - AWS CLI"
+echo "======================================"
+aws --version
 
-ARCH=amd64
-PLATFORM=$(uname -s)_$ARCH
+echo ""
+echo "======================================"
+echo "STEP 4 - AWS IAM AUTHENTICATOR"
+echo "======================================"
+aws-iam-authenticator version
 
-curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_${PLATFORM}.tar.gz"
+echo ""
+echo "======================================"
+echo "STEP 5 - DOCKER"
+echo "======================================"
+docker --version
 
-tar -xzf eksctl_${PLATFORM}.tar.gz -C /tmp
+echo ""
+echo "Docker Service:"
+sudo systemctl is-active docker
 
-sudo mv /tmp/eksctl /usr/local/bin
+echo ""
+echo "======================================"
+echo "STEP 6 - JENKINS"
+echo "======================================"
+sudo systemctl is-active jenkins
 
-eksctl version
+echo ""
+echo "Jenkins Port:"
+sudo ss -tulpn | grep 8080
+
+echo ""
+echo "======================================"
+echo "STEP 7 - DOCKER VOLUME"
+echo "======================================"
+docker volume ls | grep jenkins_data
+
+echo ""
+echo "======================================"
+echo "STEP 8 - DOCKER NETWORK"
+echo "======================================"
+docker network ls | grep jenkins_network
+
+echo ""
+echo "======================================"
+echo "STEP 9 - KUBECTL"
+echo "======================================"
+kubectl version --client 2>/dev/null || echo "kubectl NOT installed"
+
+echo ""
+echo "======================================"
+echo "STEP 10 - EKSCTL"
+echo "======================================"
+eksctl version 2>/dev/null || echo "eksctl NOT installed"
+
+echo ""
+echo "======================================"
+echo "SUMMARY"
+echo "======================================"
+
+echo "Public IP: $(curl -s ifconfig.me)"
+
+echo "Jenkins URL:"
+echo "http://$(curl -s ifconfig.me):8080"
