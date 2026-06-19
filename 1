@@ -1,47 +1,34 @@
-#!/bin/bash
+==================================
+RESTORE OLD JENKINS HOME
+==================================
+pkill: killing pid 19359 failed: Operation not permitted
 
-echo "=================================="
-echo "RESTORE OLD JENKINS HOME"
-echo "=================================="
+VERIFY OLD HOME
+drwxrwxr-x 14 ubuntu ubuntu 4096 Jun 19 14:25 /home/ubuntu/.jenkins
 
-pkill -9 -f jenkins.war || true
+START JENKINS WITH OLD HOME
 
-sleep 5
+WAIT 45 SECONDS
 
-echo ""
-echo "VERIFY OLD HOME"
-ls -ld /home/ubuntu/.jenkins
+PROCESS
+jenkins    19359       1  5 14:33 ?        00:00:27 java -jar /home/jenkins/jenkins/jenkins.war --httpPort=8080
 
-echo ""
-echo "START JENKINS WITH OLD HOME"
+WEB
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0
+HTTP/1.1 403 Forbidden
+Server: Jetty(12.1.8)
+Date: Fri, 19 Jun 2026 14:41:40 GMT
+X-Content-Type-Options: nosniff
+Content-Security-Policy-Report-Only: base-uri 'none'; default-src 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data:; script-src 'report-sample' 'self' usage.jenkins.io; style-src 'report-sample' 'self' 'unsafe-inline';
 
-sudo su - jenkins -c "
-JENKINS_HOME=/home/ubuntu/.jenkins \
-nohup java -DJENKINS_HOME=/home/ubuntu/.jenkins \
--jar /home/jenkins/jenkins/jenkins.war \
---httpPort=8080 \
->/tmp/jenkins.log 2>&1 &
-"
+CHECK JOBS
+springboot-jenkins-eks-pipeline
 
-echo ""
-echo "WAIT 45 SECONDS"
-sleep 45
+CHECK USERS
+jenkinsadminus_ccc5d1eb71f2aa19d273827d964f225a86f875b3430723a7001c71aa8f011a09
+jenkinsuser_3672fc647a9467affc2ac08baae0f12cc145d0e2c6e900940313b5880ddffd5d
 
-echo ""
-echo "PROCESS"
-ps -ef | grep jenkins.war | grep -v grep
-
-echo ""
-echo "WEB"
-curl -I http://localhost:8080 | head -5
-
-echo ""
-echo "CHECK JOBS"
-ls /home/ubuntu/.jenkins/jobs
-
-echo ""
-echo "CHECK USERS"
-ls /home/ubuntu/.jenkins/users
-
-echo ""
-echo "DONE"
+DONE
+ubuntu@ip-172-31-47-234:~$ 
