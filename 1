@@ -1,116 +1,65 @@
-======================================
-NUVEPRO FINAL LAB VALIDATION
-======================================
+#!/bin/bash
 
-1. EC2 INSTANCE
-INSTANCE TYPE = 
-FAIL
+echo "=================================="
+echo "EC2 + IAM VALIDATION"
+echo "=================================="
 
-2. IAM ROLE
-ROLE = 
-FAIL
+TOKEN=$(curl -s -X PUT 
+"http://169.254.169.254/latest/api/token" 
+-H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
-3. JAVA
-PASS
+echo ""
+echo "INSTANCE ID"
+curl -s 
+-H "X-aws-ec2-metadata-token: $TOKEN" 
+http://169.254.169.254/latest/meta-data/instance-id
 
-4. AWS CLI
-PASS
+echo ""
+echo ""
+echo "INSTANCE TYPE"
+curl -s 
+-H "X-aws-ec2-metadata-token: $TOKEN" 
+http://169.254.169.254/latest/meta-data/instance-type
 
-5. DOCKER
-PASS
+echo ""
+echo ""
+echo "IAM ROLE"
+curl -s 
+-H "X-aws-ec2-metadata-token: $TOKEN" 
+http://169.254.169.254/latest/meta-data/iam/security-credentials/
 
-6. KUBECTL
-PASS
+echo ""
+echo ""
+echo "AWS IDENTITY"
+aws sts get-caller-identity
 
-7. EKSCTL
-PASS
+echo ""
+echo "AWS ARN"
+aws sts get-caller-identity 
+--query Arn 
+--output text
 
-8. JENKINS
-FAIL
+echo ""
+echo "=================================="
+echo "RESULT"
+echo "=================================="
 
-9. JENKINS USER
-FAIL
+TYPE=$(curl -s 
+-H "X-aws-ec2-metadata-token: $TOKEN" 
+http://169.254.169.254/latest/meta-data/instance-type)
 
-10. DOCKER GROUP
-groups: 'jenkins': no such user
-FAIL
+ROLE=$(curl -s 
+-H "X-aws-ec2-metadata-token: $TOKEN" 
+http://169.254.169.254/latest/meta-data/iam/security-credentials/)
 
-11. DOCKER VOLUME
-FAIL
+if [ "$TYPE" = "t3.small" ]; then
+echo "EC2 CHECK = PASS"
+else
+echo "EC2 CHECK = FAIL ($TYPE)"
+fi
 
-12. DOCKER NETWORK
-FAIL
-
-13. ECR REPOSITORY
-{
-    "repositories": []
-}
---repository-names: command not found
-FAIL
-
-14. EKS CLUSTER
-
-aws: [ERROR]: An error occurred (ParamValidation): the following arguments are required: --name
-
-usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
-To see help text, you can run:
-
-  aws help
-  aws <command> help
-  aws <command> <subcommand> help
-
---name: command not found
-FAIL
-
-15. NODEGROUP
-
-aws: [ERROR]: An error occurred (ParamValidation): the following arguments are required: --cluster-name, --nodegroup-name
-
-usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
-To see help text, you can run:
-
-  aws help
-  aws <command> help
-  aws <command> <subcommand> help
-
---cluster-name: command not found
---nodegroup-name: command not found
-FAIL
-
-16. K8S NODES
-FAIL
-
-17. ECR IMAGE
-
-aws: [ERROR]: An error occurred (ParamValidation): the following arguments are required: --repository-name
-
-usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
-To see help text, you can run:
-
-  aws help
-  aws <command> help
-  aws <command> <subcommand> help
-
---repository-name: command not found
---region: command not found
-
-18. SPRINGBOOT DEPLOYMENT
-E0619 16:08:25.990580    7177 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:08:25.991031    7177 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:08:25.992392    7177 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:08:25.992672    7177 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:08:25.994054    7177 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-The connection to the server localhost:8080 was refused - did you specify the right host or port?
-
-19. LOADBALANCER SERVICE
-E0619 16:08:26.056994    7197 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:08:26.057329    7197 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:08:26.058788    7197 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:08:26.059050    7197 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:08:26.060457    7197 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-The connection to the server localhost:8080 was refused - did you specify the right host or port?
-
-======================================
-DONE
-======================================
-ubuntu@ip-172-31-34-211:/tmp$ 
+if [ ! -z "$ROLE" ]; then
+echo "IAM ROLE CHECK = PASS ($ROLE)"
+else
+echo "IAM ROLE CHECK = FAIL"
+fi
