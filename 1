@@ -1,12 +1,13 @@
-error: error validating "eks-deploy-k8s.yaml": error validating data: failed to download openapi: the server could not find the requested resource; if you choose to ignore these errors, turn validation off with --validate=false
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 1
-Finished: FAILURE
+echo "===== EKS ====="
+aws eks describe-cluster \
+--name jenkins-cluster \
+--region us-east-2 \
+--query cluster.status
+
+echo ""
+echo "===== KUBECONFIG ====="
+kubectl config current-context
+
+echo ""
+echo "===== NODES ====="
+kubectl get nodes
