@@ -1,48 +1,83 @@
-======================================
-      NEVO LAB VALIDATION
-======================================
+#!/bin/bash
 
-1. EC2 NAME = jenkins-server
-PASS
+PASS=0
+TOTAL=5
 
-2. INSTANCE TYPE = t3.small
-FAIL
+check() {
+  if [ $1 -eq 0 ]; then
+    echo "PASS"
+    PASS=$((PASS+1))
+  else
+    echo "FAIL"
+  fi
+}
 
-3. IAM ROLE = ec2-eks-role
-PASS
+echo "======================================"
+echo "      EKS VALIDATION"
+echo "======================================"
 
-4. SECURITY GROUP = jenkins-server-security-group
-PASS
+echo ""
+echo "1. EKS CLUSTER EXISTS"
 
-5. JAVA
-PASS
+aws eks describe-cluster \
+--name jenkins-cluster \
+--region us-east-2 >/dev/null 2>&1
 
-6. AWS CLI
-PASS
+check $?
 
-7. KUBECTL
-PASS
+echo ""
+echo "2. EKS CLUSTER STATUS"
 
-8. EKSCTL
-PASS
+STATUS=$(aws eks describe-cluster \
+--name jenkins-cluster \
+--region us-east-2 \
+--query 'cluster.status' \
+--output text 2>/dev/null)
 
-9. DOCKER
-PASS
+echo "STATUS = $STATUS"
 
-10. JENKINS
-PASS
+if [ "$STATUS" = "ACTIVE" ]; then
+  check 0
+else
+  check 1
+fi
 
-11. DOCKER VOLUME
-PASS
+echo ""
+echo "3. NODEGROUP EXISTS"
 
-12. DOCKER NETWORK
-PASS
+aws eks list-nodegroups \
+--cluster-name jenkins-cluster \
+--region us-east-2
 
-13. ECR
-PASS
+COUNT=$(aws eks list-nodegroups \
+--cluster-name jenkins-cluster \
+--region us-east-2 \
+--query 'length(nodegroups)' \
+--output text 2>/dev/null)
 
-======================================
-SCORE : 12 / 13
-======================================
-READY FOR NEXT PHASE
-ubuntu@ip-172-31-47-234:~/jenkins$ 
+if [ "$COUNT" -gt 0 ]; then
+  check 0
+else
+  check 1
+fi
+
+echo ""
+echo "4. KUBECONFIG"
+
+aws eks update-kubeconfig \
+--region us-east-2 \
+--name jenkins-cluster >/dev/null 2>&1
+
+check $?
+
+echo ""
+echo "5. K8S NODES"
+
+kubectl get nodes >/dev/null 2>&1
+
+check $?
+
+echo ""
+echo "======================================"
+echo "EKS SCORE : $PASS / $TOTAL"
+echo "======================================"
