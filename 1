@@ -1,34 +1,5 @@
-==================================
-RESTORE OLD JENKINS HOME
-==================================
-pkill: killing pid 19359 failed: Operation not permitted
+sudo ls -l /home/ubuntu/.jenkins/jobs
 
-VERIFY OLD HOME
-drwxrwxr-x 14 ubuntu ubuntu 4096 Jun 19 14:25 /home/ubuntu/.jenkins
+sudo ls -l /home/ubuntu/.jenkins/users
 
-START JENKINS WITH OLD HOME
-
-WAIT 45 SECONDS
-
-PROCESS
-jenkins    19359       1  5 14:33 ?        00:00:27 java -jar /home/jenkins/jenkins/jenkins.war --httpPort=8080
-
-WEB
-  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-                                 Dload  Upload  Total   Spent   Left   Speed
-  0      0   0      0   0      0      0      0                              0
-HTTP/1.1 403 Forbidden
-Server: Jetty(12.1.8)
-Date: Fri, 19 Jun 2026 14:41:40 GMT
-X-Content-Type-Options: nosniff
-Content-Security-Policy-Report-Only: base-uri 'none'; default-src 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data:; script-src 'report-sample' 'self' usage.jenkins.io; style-src 'report-sample' 'self' 'unsafe-inline';
-
-CHECK JOBS
-springboot-jenkins-eks-pipeline
-
-CHECK USERS
-jenkinsadminus_ccc5d1eb71f2aa19d273827d964f225a86f875b3430723a7001c71aa8f011a09
-jenkinsuser_3672fc647a9467affc2ac08baae0f12cc145d0e2c6e900940313b5880ddffd5d
-
-DONE
-ubuntu@ip-172-31-47-234:~$ 
+sudo cat /home/ubuntu/.jenkins/secrets/initialAdminPassword 2>/dev/null
