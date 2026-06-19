@@ -1,58 +1,60 @@
 #!/bin/bash
 
 echo "=================================="
-echo "RUN JENKINS AS JENKINS USER"
+echo "STEP 7 VALIDATION"
+echo "CONFIGURE JENKINS FOR DOCKER"
 echo "=================================="
 
-pkill -9 -f jenkins.war || true
+PASS=true
 
 echo ""
-echo "CREATE JENKINS HOME"
-
-sudo mkdir -p /home/jenkins/jenkins
-
-sudo cp /home/ubuntu/jenkins/jenkins.war /home/jenkins/jenkins/
-
-sudo chown -R jenkins:jenkins /home/jenkins
-
-echo ""
-echo "VERIFY FILE"
-
-ls -lah /home/jenkins/jenkins/
+echo "1. JENKINS USER EXISTS"
+if id jenkins >/dev/null 2>&1; then
+    echo "PASS"
+else
+    echo "FAIL"
+    PASS=false
+fi
 
 echo ""
-echo "START JENKINS"
-
-sudo su - jenkins -c "
-nohup java -jar /home/jenkins/jenkins/jenkins.war \
---httpPort=8080 \
-> /home/jenkins/jenkins/jenkins.log 2>&1 &
-"
-
-echo ""
-echo "WAIT 45 SECONDS"
-sleep 45
+echo "2. JENKINS IN DOCKER GROUP"
+if groups jenkins | grep -qw docker; then
+    echo "PASS"
+else
+    echo "FAIL"
+    PASS=false
+fi
 
 echo ""
-echo "PROCESS CHECK"
-ps -ef | grep jenkins.war | grep -v grep
+echo "3. SWITCH TO JENKINS USER"
+WHOAMI_RESULT=$(sudo su -s /bin/bash jenkins -c "whoami")
+
+echo "WHOAMI = $WHOAMI_RESULT"
+
+if [ "$WHOAMI_RESULT" = "jenkins" ]; then
+    echo "PASS"
+else
+    echo "FAIL"
+    PASS=false
+fi
 
 echo ""
-echo "PORT CHECK"
-ss -tulpn | grep 8080
+echo "4. DOCKER ACCESS AS JENKINS"
+
+if sudo su -s /bin/bash jenkins -c "docker ps >/dev/null 2>&1"; then
+    echo "PASS"
+else
+    echo "FAIL"
+    PASS=false
+fi
 
 echo ""
-echo "WEB CHECK"
-curl -I http://localhost:8080 | head -5
+echo "=================================="
+echo "RESULT"
+echo "=================================="
 
-echo ""
-echo "DOCKER CHECK"
-sudo su - jenkins -c "docker ps"
-
-echo ""
-echo "VALIDATION"
-OWNER=$(ps -eo user,cmd | grep jenkins.war | grep -v grep | awk '{print \$1}')
-echo "OWNER=$OWNER"
-
-echo ""
-echo "DONE"
+if [ "$PASS" = true ]; then
+    echo "STEP 7 PASSED"
+else
+    echo "STEP 7 FAILED"
+fi
