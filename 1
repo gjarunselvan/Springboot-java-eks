@@ -1,59 +1,72 @@
-==================================
-EC2 + IAM VALIDATION
-==================================
-curl: (2) no URL specified
-curl: try 'curl --help' or 'curl --manual' for more information
--bash: http://169.254.169.254/latest/api/token: No such file or directory
--H: command not found
+#!/bin/bash
 
-INSTANCE ID
-curl: (2) no URL specified
-curl: try 'curl --help' or 'curl --manual' for more information
--H: command not found
--bash: http://169.254.169.254/latest/meta-data/instance-id: No such file or directory
+echo "=================================="
+echo "LAB VALIDATION"
+echo "=================================="
 
+echo ""
+echo "1. AWS IDENTITY"
+aws sts get-caller-identity
 
-INSTANCE TYPE
-curl: (2) no URL specified
-curl: try 'curl --help' or 'curl --manual' for more information
--H: command not found
--bash: http://169.254.169.254/latest/meta-data/instance-type: No such file or directory
+echo ""
+echo "2. IAM ROLE"
 
+ROLE=$(aws sts get-caller-identity --query Arn --output text 2>/dev/null)
 
-IAM ROLE
-curl: (2) no URL specified
-curl: try 'curl --help' or 'curl --manual' for more information
--H: command not found
--bash: http://169.254.169.254/latest/meta-data/iam/security-credentials/: No such file or directory
+echo "$ROLE"
 
+if echo "$ROLE" | grep -q "assumed-role"; then
+echo "PASS"
+else
+echo "FAIL"
+fi
 
-AWS IDENTITY
-{
-    "UserId": "AROATHVQLNMZROODAWRNA:i-0e5aff41befcc5d21",
-    "Account": "222634404659",
-    "Arn": "arn:aws:sts::222634404659:assumed-role/ec2-role/i-0e5aff41befcc5d21"
-}
+echo ""
+echo "3. INSTANCE TYPE"
 
-AWS ARN
-{
-    "UserId": "AROATHVQLNMZROODAWRNA:i-0e5aff41befcc5d21",
-    "Account": "222634404659",
-    "Arn": "arn:aws:sts::222634404659:assumed-role/ec2-role/i-0e5aff41befcc5d21"
-}
---query: command not found
---output: command not found
+TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
-==================================
-RESULT
-==================================
-curl: (2) no URL specified
-curl: try 'curl --help' or 'curl --manual' for more information
--H: command not found
--bash: http://169.254.169.254/latest/meta-data/instance-type: No such file or directory
-curl: (2) no URL specified
-curl: try 'curl --help' or 'curl --manual' for more information
--H: command not found
--bash: http://169.254.169.254/latest/meta-data/iam/security-credentials/: No such file or directory
-EC2 CHECK = FAIL ()
-IAM ROLE CHECK = FAIL
-ubuntu@ip-172-31-34-211:/tmp$ 
+TYPE=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-type)
+
+echo "$TYPE"
+
+if [ "$TYPE" = "t3.small" ]; then
+echo "PASS"
+else
+echo "FAIL"
+fi
+
+echo ""
+echo "4. JENKINS"
+
+systemctl is-active jenkins || true
+
+echo ""
+echo "5. JENKINS USER"
+
+id jenkins || true
+
+echo ""
+echo "6. DOCKER GROUP"
+
+groups jenkins || true
+
+echo ""
+echo "7. DOCKER VOLUME"
+
+sudo docker volume ls
+
+echo ""
+echo "8. DOCKER NETWORK"
+
+sudo docker network ls
+
+echo ""
+echo "=================================="
+echo "SUMMARY"
+echo "=================================="
+
+echo "If Jenkins inactive -> install Jenkins"
+echo "If jenkins user missing -> Jenkins not installed"
+echo "If jenkins_data missing -> create volume"
+echo "If jenkins_network missing -> create network"
