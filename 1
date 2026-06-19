@@ -1,112 +1,73 @@
-1. EC2 INSTANCE
-INSTANCE TYPE = 
-FAIL
+#!/bin/bash
 
-2. IAM ROLE
-ROLE = 
-FAIL
+set -e
 
-3. JAVA
-PASS
+echo "=================================="
+echo "INSTALL JENKINS"
+echo "=================================="
 
-4. AWS CLI
-PASS
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | 
+sudo tee /usr/share/keyrings/jenkins-keyring.asc >/dev/null
 
-5. DOCKER
-PASS
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | 
+sudo tee /etc/apt/sources.list.d/jenkins.list >/dev/null
 
-6. KUBECTL
-PASS
+sudo apt update -y
 
-7. EKSCTL
-PASS
+sudo apt install -y jenkins
 
-8. JENKINS
-FAIL
+echo "=================================="
+echo "START JENKINS"
+echo "=================================="
 
-9. JENKINS USER
-FAIL
+sudo systemctl enable jenkins
+sudo systemctl restart jenkins
 
-10. DOCKER GROUP
-groups: 'jenkins': no such user
-FAIL
+sleep 10
 
-11. DOCKER VOLUME
-FAIL
+echo "=================================="
+echo "DOCKER ACCESS"
+echo "=================================="
 
-12. DOCKER NETWORK
-FAIL
+sudo usermod -aG docker jenkins
 
-13. ECR REPOSITORY
-{
-    "repositories": []
-}
---repository-names: command not found
-FAIL
+echo "=================================="
+echo "LAB REQUIREMENTS"
+echo "=================================="
 
-14. EKS CLUSTER
+sudo docker volume create jenkins_data || true
 
-aws: [ERROR]: An error occurred (ParamValidation): the following arguments are required: --name
+sudo docker network create jenkins_network || true
 
-usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
-To see help text, you can run:
+echo "=================================="
+echo "VALIDATION"
+echo "=================================="
 
-  aws help
-  aws <command> help
-  aws <command> <subcommand> help
+echo ""
+echo "JENKINS SERVICE"
+systemctl is-active jenkins
 
---name: command not found
-FAIL
+echo ""
+echo "JENKINS USER"
+id jenkins
 
-15. NODEGROUP
+echo ""
+echo "GROUPS"
+groups jenkins
 
-aws: [ERROR]: An error occurred (ParamValidation): the following arguments are required: --cluster-name, --nodegroup-name
+echo ""
+echo "VOLUMES"
+sudo docker volume ls | grep jenkins_data
 
-usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
-To see help text, you can run:
+echo ""
+echo "NETWORKS"
+sudo docker network ls | grep jenkins_network
 
-  aws help
-  aws <command> help
-  aws <command> <subcommand> help
+echo ""
+echo "JENKINS PASSWORD"
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 
---cluster-name: command not found
---nodegroup-name: command not found
-FAIL
-
-16. K8S NODES
-FAIL
-
-17. ECR IMAGE
-
-aws: [ERROR]: An error occurred (ParamValidation): the following arguments are required: --repository-name
-
-usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
-To see help text, you can run:
-
-  aws help
-  aws <command> help
-  aws <command> <subcommand> help
-
---repository-name: command not found
---region: command not found
-
-18. SPRINGBOOT DEPLOYMENT
-E0619 16:12:46.603497    8245 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:12:46.603826    8245 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:12:46.605226    8245 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:12:46.605479    8245 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:12:46.606983    8245 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-The connection to the server localhost:8080 was refused - did you specify the right host or port?
-
-19. LOADBALANCER SERVICE
-E0619 16:12:46.670820    8264 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:12:46.671146    8264 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:12:46.672563    8264 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:12:46.672812    8264 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-E0619 16:12:46.674113    8264 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
-The connection to the server localhost:8080 was refused - did you specify the right host or port?
-
-======================================
-DONE
-======================================
-ubuntu@ip-172-31-34-211:/tmp$ 
+echo ""
+echo "=================================="
+echo "DONE"
+echo "=================================="
