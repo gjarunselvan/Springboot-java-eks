@@ -1,29 +1,113 @@
-======================================
-      EKS VALIDATION
-======================================
+#!/bin/bash
 
-1. EKS CLUSTER EXISTS
-PASS
+PASS=0
+TOTAL=10
 
-2. EKS CLUSTER STATUS
-STATUS = ACTIVE
-PASS
-
-3. NODEGROUP EXISTS
-{
-    "nodegroups": [
-        "jenkins-nodegroup"
-    ]
+check() {
+    if [ $1 -eq 0 ]; then
+        echo "PASS"
+        PASS=$((PASS+1))
+    else
+        echo "FAIL"
+    fi
 }
-PASS
 
-4. KUBECONFIG
-PASS
+echo "======================================"
+echo " FINAL LAB VALIDATION"
+echo "======================================"
 
-5. K8S NODES
-PASS
+echo ""
+echo "1. EC2"
+aws ec2 describe-instances \
+--filters "Name=tag:Name,Values=jenkins-server" \
+--query 'Reservations[*].Instances[*].InstanceType' \
+--output text | grep -q "t3.small"
+check $?
 
-======================================
-EKS SCORE : 5 / 5
-======================================
-ubuntu@ip-172-31-47-234:~$ 
+echo ""
+echo "2. IAM ROLE"
+aws iam get-role --role-name ec2-eks-role >/dev/null 2>&1
+check $?
+
+echo ""
+echo "3. SECURITY GROUP"
+aws ec2 describe-security-groups \
+--filters Name=group-name,Values=jenkins-server-security-group >/dev/null 2>&1
+check $?
+
+echo ""
+echo "4. JENKINS"
+curl -s http://localhost:8080 >/dev/null
+check $?
+
+echo ""
+echo "5. GITHUB REPO"
+git ls-remote https://github.com/gjarunselvan/springboot-jenkins-eks.git >/dev/null 2>&1
+check $?
+
+echo ""
+echo "6. ECR"
+aws ecr describe-repositories \
+--repository-names springboot-jenkins-ecr-repo \
+--region us-east-2 >/dev/null 2>&1
+check $?
+
+echo ""
+echo "7. EKS"
+STATUS=$(aws eks describe-cluster \
+--name jenkins-cluster \
+--region us-east-2 \
+--query 'cluster.status' \
+--output text)
+
+echo "STATUS=$STATUS"
+
+[ "$STATUS" = "ACTIVE" ]
+check $?
+
+echo ""
+echo "8. NODEGROUP"
+aws eks list-nodegroups \
+--cluster-name jenkins-cluster \
+--region us-east-2 \
+--query 'length(nodegroups)' \
+--output text | grep -q '[1-9]'
+check $?
+
+echo ""
+echo "9. K8S NODES"
+kubectl get nodes >/dev/null 2>&1
+check $?
+
+echo ""
+echo "10. SPRINGBOOT DEPLOYMENT"
+kubectl get deployment springboot-app >/dev/null 2>&1
+check $?
+
+echo ""
+echo "======================================"
+echo "FINAL SCORE : $PASS / $TOTAL"
+echo "======================================"
+
+echo ""
+echo "===== DEPLOYMENTS ====="
+kubectl get deployment 2>/dev/null || true
+
+echo ""
+echo "===== PODS ====="
+kubectl get pods -o wide 2>/dev/null || true
+
+echo ""
+echo "===== SERVICES ====="
+kubectl get svc 2>/dev/null || true
+
+echo ""
+echo "===== ECR IMAGES ====="
+aws ecr list-images \
+--repository-name springboot-jenkins-ecr-repo \
+--region us-east-2 2>/dev/null || true
+
+echo ""
+echo "======================================"
+echo "DONE"
+echo "======================================"
