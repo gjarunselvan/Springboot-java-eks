@@ -1,29 +1,14 @@
-#!/bin/bash
-
-echo "=================================="
-echo "INSTALL MAVEN"
-echo "=================================="
-
-sudo apt update
-
-sudo apt install -y maven
-
-echo ""
-echo "VERIFY MAVEN"
-
-which mvn
-
-mvn -version
-
-echo ""
-echo "VERIFY JENKINS CAN SEE MAVEN"
-
-sudo su - jenkins -c "which mvn"
-
-sudo su - jenkins -c "mvn -version"
-
-echo ""
-echo "=================================="
-echo "DONE"
-echo "=================================="
-echo "Now Build Now again"
+[Pipeline] sh
++ kubectl apply -f deployment-service.yml
+error: the path "deployment-service.yml" does not exist
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+Finished: FAILURE
