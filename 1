@@ -1,80 +1,74 @@
-==================================
-DISK BEFORE
-==================================
-Filesystem       Size  Used Avail Use% Mounted on
-/dev/root        6.7G  4.5G  2.2G  68% /
-tmpfs            953M     0  953M   0% /dev/shm
-tmpfs            382M  976K  381M   1% /run
-efivarfs         128K  3.1K  120K   3% /sys/firmware/efi/efivars
-tmpfs            953M  101M  853M  11% /tmp
-none             1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
-none             1.0M     0  1.0M   0% /run/credentials/systemd-resolved.service
-/dev/nvme0n1p13  989M   96M  827M  11% /boot
-/dev/nvme0n1p15  105M  6.3M   99M   7% /boot/efi
-none             1.0M     0  1.0M   0% /run/credentials/systemd-networkd.service
-none             1.0M     0  1.0M   0% /run/credentials/getty@tty1.service
-none             1.0M     0  1.0M   0% /run/credentials/serial-getty@ttyS0.service
-tmpfs            191M  8.0K  191M   1% /run/user/1000
+#!/bin/bash
 
-==================================
-STOP JENKINS
-==================================
+echo "=================================="
+echo "CREATE JENKINS DIRECTORY"
+echo "=================================="
 
-==================================
-CLEAN TEMP
-==================================
+mkdir -p $HOME/jenkins
 
-==================================
-CREATE JENKINS DIR
-==================================
+echo ""
+echo "=================================="
+echo "DOWNLOAD JENKINS"
+echo "=================================="
 
-==================================
-MOVE JENKINS WAR
-==================================
+cd $HOME/jenkins
 
-==================================
-START JENKINS
-==================================
-[1] 11387
+curl -L -o jenkins.war \
+https://get.jenkins.io/war-stable/latest/jenkins.war
 
-[1]+  Exit 1                     nohup java -jar $HOME/jenkins/jenkins.war --httpPort=8080 > $HOME/jenkins/jenkins.log 2>&1
-WAITING 30 SECONDS...
+echo ""
+echo "=================================="
+echo "START JENKINS"
+echo "=================================="
 
-==================================
-VERIFY JENKINS
-==================================
-ubuntu     11432   11173  0 13:30 pts/1    00:00:00 grep --color=auto jenkins.war
+nohup java -jar $HOME/jenkins/jenkins.war \
+--httpPort=8080 \
+> $HOME/jenkins/jenkins.log 2>&1 &
 
+echo ""
+echo "WAITING 60 SECONDS..."
+sleep 60
 
-  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-                                 Dload  Upload  Total   Spent   Left   Speed
-  0      0   0      0   0      0      0      0                              0
-curl: (7) Failed to connect to localhost port 8080 after 0 ms: Could not connect to server
+echo ""
+echo "=================================="
+echo "PROCESS CHECK"
+echo "=================================="
 
-==================================
-DISK AFTER
-==================================
-Filesystem       Size  Used Avail Use% Mounted on
-/dev/root        6.7G  4.5G  2.2G  68% /
-tmpfs            953M     0  953M   0% /dev/shm
-tmpfs            382M  976K  381M   1% /run
-efivarfs         128K  3.1K  120K   3% /sys/firmware/efi/efivars
-tmpfs            953M     0  953M   0% /tmp
-none             1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
-none             1.0M     0  1.0M   0% /run/credentials/systemd-resolved.service
-/dev/nvme0n1p13  989M   96M  827M  11% /boot
-/dev/nvme0n1p15  105M  6.3M   99M   7% /boot/efi
-none             1.0M     0  1.0M   0% /run/credentials/systemd-networkd.service
-none             1.0M     0  1.0M   0% /run/credentials/getty@tty1.service
-none             1.0M     0  1.0M   0% /run/credentials/serial-getty@ttyS0.service
-tmpfs            191M  8.0K  191M   1% /run/user/1000
+ps -ef | grep jenkins.war
 
-==================================
-EKS STATUS
-==================================
-CREATING
+echo ""
+echo "=================================="
+echo "PORT CHECK"
+echo "=================================="
 
-==================================
-DONE
-==================================
-ubuntu@ip-172-31-47-234:~$ 
+ss -tulpn | grep 8080
+
+echo ""
+echo "=================================="
+echo "HTTP CHECK"
+echo "=================================="
+
+curl -I http://localhost:8080
+
+echo ""
+echo "=================================="
+echo "LAST 20 LOG LINES"
+echo "=================================="
+
+tail -20 $HOME/jenkins/jenkins.log
+
+echo ""
+echo "=================================="
+echo "EKS STATUS"
+echo "=================================="
+
+aws eks describe-cluster \
+--name jenkins-cluster \
+--region us-east-2 \
+--query 'cluster.status' \
+--output text
+
+echo ""
+echo "=================================="
+echo "DONE"
+echo "=================================="
