@@ -1,67 +1,28 @@
-ubuntu@ip-172-31-39-80:~$ ./set.sh 
-======================================
-STEP 1 - EC2 HOSTNAME
-======================================
-ip-172-31-39-80
+STEP 14 - Login to Jenkins
 
-======================================
-STEP 2 - JAVA
-======================================
-openjdk version "17.0.19" 2026-04-21
-OpenJDK Runtime Environment (build 17.0.19+10-1-26.04.2-Ubuntu)
-OpenJDK 64-Bit Server VM (build 17.0.19+10-1-26.04.2-Ubuntu, mixed mode, sharing)
+Open:
 
-======================================
-STEP 3 - AWS CLI
-======================================
-aws-cli/2.35.8 Python/3.14.5 Linux/7.0.0-1006-aws exe/x86_64.ubuntu.26
-
-======================================
-STEP 4 - AWS IAM AUTHENTICATOR
-======================================
-{"Version":"v0.6.29","Commit":"8769c8f063f072830ccd737d29a049a5a4609571"}
-
-======================================
-STEP 5 - DOCKER
-======================================
-Docker version 29.1.3, build 29.1.3-0ubuntu4.1
-
-Docker Service:
-active
-
-======================================
-STEP 6 - JENKINS
-======================================
-active
-
-Jenkins Port:
-tcp   LISTEN 0      50                     *:8080             *:*    users:(("java",pid=13420,fd=8))                        
-
-======================================
-STEP 7 - DOCKER VOLUME
-======================================
-local     jenkins_data
-
-======================================
-STEP 8 - DOCKER NETWORK
-======================================
-0f04cffead58   jenkins_network   bridge    local
-
-======================================
-STEP 9 - KUBECTL
-======================================
-Client Version: v1.36.2
-Kustomize Version: v5.8.1
-
-======================================
-STEP 10 - EKSCTL
-======================================
-0.227.0
-
-======================================
-SUMMARY
-======================================
-Public IP: 3.137.153.32
-Jenkins URL:
 http://3.137.153.32:8080
-ubuntu@ip-172-31-39-80:~$ 
+
+Password:
+
+9169525586d44fc8b5653fa5b72df1d4
+Select
+Install Suggested Plugins
+
+Wait 5-10 mins.
+
+STEP 15 - Create Admin User
+
+Create exactly:
+
+Field	Value
+Username	jenkins-admin-user
+Password	jenkins_springboot4684$
+Confirm Password	jenkins_springboot4684$
+Full Name	Jenkins Admin
+Email	your email
+
+Click:
+
+Save and Continue
