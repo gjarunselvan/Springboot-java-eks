@@ -1,48 +1,47 @@
 #!/bin/bash
 
 echo "=================================="
-echo "FIX DOCKER ACCESS"
+echo "CREATE JENKINS USER"
 echo "=================================="
 
-echo ""
-echo "1. ADD UBUNTU TO DOCKER GROUP"
-sudo usermod -aG docker ubuntu
+if id "jenkins" >/dev/null 2>&1; then
+    echo "jenkins user already exists"
+else
+    sudo useradd -m -s /bin/bash jenkins
+    echo "jenkins user created"
+fi
 
 echo ""
-echo "2. VERIFY GROUP MEMBERSHIP"
-groups ubuntu
+echo "=================================="
+echo "ADD TO DOCKER GROUP"
+echo "=================================="
+
+sudo usermod -aG docker jenkins
 
 echo ""
-echo "3. FIX DOCKER SOCKET"
-sudo chown root:docker /var/run/docker.sock
-sudo chmod 660 /var/run/docker.sock
+echo "=================================="
+echo "RESTART DOCKER"
+echo "=================================="
 
-echo ""
-echo "4. RESTART DOCKER"
 sudo systemctl restart docker
 
 echo ""
-echo "5. RESTART JENKINS"
-pkill -f jenkins.war || true
+echo "=================================="
+echo "VERIFY USER"
+echo "=================================="
 
-nohup java -jar ~/jenkins/jenkins.war \
---httpPort=8080 \
-> ~/jenkins/jenkins.log 2>&1 &
-
-echo ""
-echo "WAITING 30 SECONDS..."
-sleep 30
-
-echo ""
-echo "6. VERIFY DOCKER"
-docker ps
-
-echo ""
-echo "7. VERIFY JENKINS"
-curl -I http://localhost:8080 | head -5
+id jenkins
 
 echo ""
 echo "=================================="
-echo "DONE"
+echo "VERIFY DOCKER ACCESS"
 echo "=================================="
-echo "Now go to Jenkins -> Build Now"
+
+sudo su - jenkins -c "docker ps"
+
+echo ""
+echo "=================================="
+echo "RESULT"
+echo "=================================="
+
+echo "If docker ps works, Jenkins user is ready."
