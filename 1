@@ -1,40 +1,58 @@
-==================================
-MOVE JENKINS TO JENKINS USER
-==================================
+#!/bin/bash
 
-1. STOP JENKINS
-[1]+  Killed                     nohup java -jar /home/ubuntu/jenkins/jenkins.war --httpPort=8080 > /home/ubuntu/jenkins/jenkins.log 2>&1
+echo "=================================="
+echo "RUN JENKINS AS JENKINS USER"
+echo "=================================="
 
-2. FIX OWNERSHIP
+pkill -9 -f jenkins.war || true
 
-3. VERIFY JENKINS USER
-uid=1001(jenkins) gid=1001(jenkins) groups=1001(jenkins),109(docker)
+echo ""
+echo "CREATE JENKINS HOME"
 
-4. START AS JENKINS USER
--bash: line 2: /home/ubuntu/jenkins/jenkins.log: Permission denied
+sudo mkdir -p /home/jenkins/jenkins
 
-WAIT 30 SECONDS...
+sudo cp /home/ubuntu/jenkins/jenkins.war /home/jenkins/jenkins/
 
-5. PROCESS CHECK
+sudo chown -R jenkins:jenkins /home/jenkins
 
-6. PORT CHECK
+echo ""
+echo "VERIFY FILE"
 
-7. WEB CHECK
-  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-                                 Dload  Upload  Total   Spent   Left   Speed
-  0      0   0      0   0      0      0      0                              0
-curl: (7) Failed to connect to localhost port 8080 after 1 ms: Could not connect to server
+ls -lah /home/jenkins/jenkins/
 
-8. DOCKER AS JENKINS
-CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+echo ""
+echo "START JENKINS"
 
-==================================
-VALIDATION
-==================================
-PROCESS OWNER = 
-FAIL - Jenkins still not running as jenkins user
+sudo su - jenkins -c "
+nohup java -jar /home/jenkins/jenkins/jenkins.war \
+--httpPort=8080 \
+> /home/jenkins/jenkins/jenkins.log 2>&1 &
+"
 
-==================================
-DONE
-==================================
-ubuntu@ip-172-31-47-234:~$ 
+echo ""
+echo "WAIT 45 SECONDS"
+sleep 45
+
+echo ""
+echo "PROCESS CHECK"
+ps -ef | grep jenkins.war | grep -v grep
+
+echo ""
+echo "PORT CHECK"
+ss -tulpn | grep 8080
+
+echo ""
+echo "WEB CHECK"
+curl -I http://localhost:8080 | head -5
+
+echo ""
+echo "DOCKER CHECK"
+sudo su - jenkins -c "docker ps"
+
+echo ""
+echo "VALIDATION"
+OWNER=$(ps -eo user,cmd | grep jenkins.war | grep -v grep | awk '{print \$1}')
+echo "OWNER=$OWNER"
+
+echo ""
+echo "DONE"
