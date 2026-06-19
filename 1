@@ -1,26 +1,40 @@
-==================================
-DISABLE JENKINS SECURITY
-==================================
+#!/bin/bash
 
-VERIFY
-  <useSecurity>false</useSecurity>
+echo "=================================="
+echo "FIX JENKINS HOME PERMISSIONS"
+echo "=================================="
 
-RESTART JENKINS
-Killed                     sudo pkill -9 -f jenkins.war
+sudo chown -R jenkins:jenkins /home/ubuntu/.jenkins
 
-WAIT 45 SECONDS...
+sudo chmod -R u+rwX /home/ubuntu/.jenkins
 
-PROCESS
+echo ""
+echo "START JENKINS"
 
-WEB
-  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-                                 Dload  Upload  Total   Spent   Left   Speed
-  0      0   0      0   0      0      0      0                              0
-curl: (7) Failed to connect to localhost port 8080 after 1 ms: Could not connect to server
+sudo su - jenkins -c "
+export JENKINS_HOME=/home/ubuntu/.jenkins
+nohup java \
+-DJENKINS_HOME=/home/ubuntu/.jenkins \
+-jar /home/jenkins/jenkins/jenkins.war \
+--httpPort=8080 \
+>/tmp/jenkins.log 2>&1 &
+"
 
-==================================
-DONE
-==================================
-Open Jenkins now.
-It should not ask for login.
-ubuntu@ip-172-31-47-234:~$ 
+echo ""
+echo "WAIT 30 SECONDS"
+sleep 30
+
+echo ""
+echo "PROCESS"
+ps -ef | grep jenkins.war | grep -v grep
+
+echo ""
+echo "PORT"
+ss -tulpn | grep 8080
+
+echo ""
+echo "LOG"
+tail -50 /tmp/jenkins.log
+
+echo ""
+echo "DONE"
