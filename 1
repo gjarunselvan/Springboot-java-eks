@@ -1,4 +1,4 @@
-#!/bin/bash
+ubuntu@ip-172-31-47-234:~$ #!/bin/bash
 
 REGION="us-east-2"
 
@@ -55,3 +55,91 @@ echo ""
 echo "=================================="
 echo "DONE"
 echo "=================================="
+==================================
+EKS FINAL VALIDATION
+==================================
+
+===== CLUSTER STATUS =====
+CREATING
+
+===== NODEGROUPS =====
+{
+    "nodegroups": []
+}
+
+===== UPDATE KUBECONFIG =====
+
+aws: [ERROR]: Cluster status is CREATING
+
+===== KUBECTL CONTEXT =====
+error: current-context is not set
+
+===== NODES =====
+E0619 13:22:35.471363   10561 memcache.go:265] "Unhandled Error" err=<
+	couldn't get current server API group list: <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+	Authentication required
+	<!--
+	-->
+	
+	</body></html>
+ >
+E0619 13:22:35.475169   10561 memcache.go:265] "Unhandled Error" err=<
+	couldn't get current server API group list: <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+	Authentication required
+	<!--
+	-->
+	
+	</body></html>
+ >
+E0619 13:22:35.480028   10561 memcache.go:265] "Unhandled Error" err=<
+	couldn't get current server API group list: <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+	Authentication required
+	<!--
+	-->
+	
+	</body></html>
+ >
+E0619 13:22:35.484199   10561 memcache.go:265] "Unhandled Error" err=<
+	couldn't get current server API group list: <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+	Authentication required
+	<!--
+	-->
+	
+	</body></html>
+ >
+E0619 13:22:35.487394   10561 memcache.go:265] "Unhandled Error" err=<
+	couldn't get current server API group list: <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+	Authentication required
+	<!--
+	-->
+	
+	</body></html>
+ >
+Error from server (Forbidden): <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%3Ftimeout%3D32s'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%3Ftimeout%3D32s' src='/static/c0680bef/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+Authentication required
+<!--
+-->
+
+</body></html>
+
+===== ECR =====
+springboot-jenkins-ecr-repo
+
+===== JENKINS =====
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0
+HTTP/1.1 403 Forbidden
+Server: Jetty(12.1.8)
+Date: Fri, 19 Jun 2026 13:22:36 GMT
+X-Content-Type-Options: nosniff
+Content-Security-Policy-Report-Only: base-uri 'none'; default-src 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data:; script-src 'report-sample' 'self' usage.jenkins.io; style-src 'report-sample' 'self' 'unsafe-inline';
+
+===== DOCKER =====
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+
+==================================
+DONE
+==================================
+ubuntu@ip-172-31-47-234:~$ 
