@@ -1,49 +1,233 @@
 #!/bin/bash
 
-echo "=================================="
-echo "FIX DOCKER FOR JENKINS PIPELINE"
-echo "=================================="
+SCORE=0
+TOTAL=15
+
+echo "======================================"
+echo " NUVEPRO FINAL LAB VALIDATION"
+echo "======================================"
 
 echo ""
-echo "1. CURRENT USER"
-whoami
+echo "1. EC2 INSTANCE TYPE"
+TYPE=$(curl -s http://169.254.169.254/latest/meta-data/instance-type)
+echo "INSTANCE TYPE = $TYPE"
+
+if [ "$TYPE" = "t3.small" ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
 
 echo ""
-echo "2. ADD UBUNTU TO DOCKER GROUP"
-sudo usermod -aG docker ubuntu
+echo "2. IAM ROLE"
+ROLE=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/)
+
+if [ ! -z "$ROLE" ]; then
+  echo "ROLE = $ROLE"
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
 
 echo ""
-echo "3. REFRESH GROUP"
-newgrp docker <<EOF
+echo "3. JAVA"
+java -version >/dev/null 2>&1
+
+if [ $? -eq 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
 
 echo ""
-echo "4. VERIFY DOCKER ACCESS"
-docker ps
+echo "4. AWS CLI"
+
+aws --version >/dev/null 2>&1
+
+if [ $? -eq 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
 
 echo ""
-echo "5. VERIFY DOCKER BUILD"
-docker images
+echo "5. DOCKER"
 
-EOF
+docker --version >/dev/null 2>&1
 
-echo ""
-echo "6. RESTART JENKINS"
-pkill -f jenkins.war || true
-
-nohup java -jar ~/jenkins/jenkins.war \
---httpPort=8080 \
-> ~/jenkins/jenkins.log 2>&1 &
+if [ $? -eq 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
 
 echo ""
-echo "WAITING 30 SECONDS..."
-sleep 30
+echo "6. KUBECTL"
+
+kubectl version --client >/dev/null 2>&1
+
+if [ $? -eq 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
 
 echo ""
-echo "7. VERIFY JENKINS"
-curl -I http://localhost:8080 | head -5
+echo "7. EKSCTL"
+
+eksctl version >/dev/null 2>&1
+
+if [ $? -eq 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
 
 echo ""
-echo "=================================="
-echo "READY"
-echo "=================================="
-echo "Go to Jenkins -> Build Now"
+echo "8. JENKINS"
+
+curl -s http://localhost:8080/login >/dev/null
+
+if [ $? -eq 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
+
+echo ""
+echo "9. ECR REPOSITORY"
+
+aws ecr describe-repositories \
+--repository-names springboot-jenkins-ecr-repo \
+--region us-east-2 >/dev/null 2>&1
+
+if [ $? -eq 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
+
+echo ""
+echo "10. EKS CLUSTER"
+
+STATUS=$(aws eks describe-cluster \
+--name jenkins-cluster \
+--region us-east-2 \
+--query cluster.status \
+--output text 2>/dev/null)
+
+echo "STATUS = $STATUS"
+
+if [ "$STATUS" = "ACTIVE" ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
+
+echo ""
+echo "11. NODEGROUP"
+
+aws eks list-nodegroups \
+--cluster-name jenkins-cluster \
+--region us-east-2 \
+--query 'nodegroups[0]' \
+--output text | grep -q jenkins-nodegroup
+
+if [ $? -eq 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
+
+echo ""
+echo "12. K8S NODES"
+
+kubectl get nodes --no-headers 2>/dev/null | grep -q Ready
+
+if [ $? -eq 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
+
+echo ""
+echo "13. ECR IMAGE"
+
+COUNT=$(aws ecr list-images \
+--repository-name springboot-jenkins-ecr-repo \
+--region us-east-2 \
+--query 'length(imageIds)' \
+--output text 2>/dev/null)
+
+echo "IMAGE COUNT = $COUNT"
+
+if [ "$COUNT" -gt 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
+
+echo ""
+echo "14. SPRINGBOOT DEPLOYMENT"
+
+kubectl get deployment springboot-app >/dev/null 2>&1
+
+if [ $? -eq 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
+
+echo ""
+echo "15. LOAD BALANCER SERVICE"
+
+kubectl get svc | grep -q LoadBalancer
+
+if [ $? -eq 0 ]; then
+  echo "PASS"
+  SCORE=$((SCORE+1))
+else
+  echo "FAIL"
+fi
+
+echo ""
+echo "======================================"
+echo "FINAL SCORE : $SCORE / $TOTAL"
+echo "======================================"
+
+echo ""
+echo "===== DEPLOYMENTS ====="
+kubectl get deployment 2>/dev/null
+
+echo ""
+echo "===== PODS ====="
+kubectl get pods -A 2>/dev/null
+
+echo ""
+echo "===== SERVICES ====="
+kubectl get svc 2>/dev/null
+
+echo ""
+echo "===== ECR IMAGES ====="
+aws ecr list-images \
+--repository-name springboot-jenkins-ecr-repo \
+--region us-east-2 2>/dev/null
+
+echo ""
+echo "======================================"
+echo "DONE"
+echo "======================================"
